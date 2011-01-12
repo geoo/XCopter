@@ -4,9 +4,9 @@ import net.sourceforge.jFuzzyLogic.FIS;
 
 
 public class FisThread  extends Thread {
-	FIS fis;
-	Thread thread;
-	Data data;
+	private FIS fis;
+	private Thread thread;
+	private Data data;
 	private JFreeChart test;
 	
 	public FisThread(Data data){
@@ -33,17 +33,16 @@ public class FisThread  extends Thread {
 		start();
 	}
 	public void run() {
-		// TODO Auto-generated method stub
 		while(true){
-		System.out.println("DATA oben: "+data.getOben());
+		//System.out.println("DATA oben: "+data.getOben());
 		fis.setVariable("oben", data.getOben());
-		System.out.println("DATA unten: "+data.getUnten());
+		//System.out.println("DATA unten: "+data.getUnten());
 		fis.setVariable("unten", data.getUnten());
-		System.out.println("DATA front: "+data.getFront());
+		//System.out.println("DATA front: "+data.getFront());
 		fis.setVariable("front", data.getFront());
 
 		fis.evaluate();
-		test.fireChartChanged();
+		System.out.println("VALUE: "+fis.getVariable("auftrieb").getLatestDefuzzifiedValue());
 		//fis.getVariable("auftrieb").chartDefuzzifier(true);
 }
 		//fis.evaluate();
