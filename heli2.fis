@@ -1,0 +1,87 @@
+[System]
+Name='heli2'
+Type='mamdani'
+Version=2.0
+NumInputs=5
+NumOutputs=2
+NumRules=15
+AndMethod='min'
+OrMethod='max'
+ImpMethod='min'
+AggMethod='max'
+DefuzzMethod='centroid'
+
+[Input1]
+Name='oben'
+Range=[0 100]
+NumMFs=3
+MF1='nah':'trapmf',[-36 -4 20 30]
+MF2='mittel':'trapmf',[20 30 60 70]
+MF3='weit':'trapmf',[60 70 104 136]
+
+[Input2]
+Name='frontOben'
+Range=[0 100]
+NumMFs=3
+MF1='nah':'trapmf',[-36 -4 20 30]
+MF2='mittel':'trapmf',[20 30 60 70]
+MF3='weit':'trapmf',[60 70 104 136]
+
+[Input3]
+Name='front'
+Range=[0 100]
+NumMFs=3
+MF1='nah':'trapmf',[-36 -4 20 30]
+MF2='mittel':'trapmf',[20 30 60 70]
+MF3='weit':'trapmf',[60 70 104 136]
+
+[Input4]
+Name='frontUnten'
+Range=[0 100]
+NumMFs=3
+MF1='nah':'trapmf',[-36 -4 20 30]
+MF2='mittel':'trapmf',[20 30 60 70]
+MF3='weit':'trapmf',[60 70 104 136]
+
+[Input5]
+Name='unten'
+Range=[0 100]
+NumMFs=3
+MF1='nah':'trapmf',[-36 -4 20 30]
+MF2='mittel':'trapmf',[20 30 60 70]
+MF3='weit':'trapmf',[60 70 104 136]
+
+[Output1]
+Name='auftrieb'
+Range=[-20 120]
+NumMFs=5
+MF1='starkerSinkflug':'trapmf',[-20 -7.5 7.5 20]
+MF2='leichterSinkflug':'trapmf',[7.5 17.5 32.5 42.5]
+MF3='hoeheBeibehalten':'trapmf',[32.5 42.5 57.5 67.5]
+MF4='leichterAuftrieb':'trapmf',[57.5 67.5 82.5 92.5]
+MF5='starkerAuftrieb':'trapmf',[82.5 92.5 107.5 120]
+
+[Output2]
+Name='schub'
+Range=[-37 137]
+NumMFs=3
+MF1='stillstand':'trapmf',[-37 -27 27 37]
+MF2='langsam':'trapmf',[27 37 63 73]
+MF3='normal':'trapmf',[63 73 127 137]
+
+[Rules]
+3 0 0 0 0, 3 0 (1) : 1
+2 0 0 0 0, 2 0 (1) : 1
+1 0 0 0 0, 1 0 (1) : 1
+0 0 0 0 3, 3 0 (1) : 1
+0 0 0 0 2, 2 0 (1) : 1
+0 0 0 0 1, 1 0 (1) : 1
+0 3 0 0 0, 2 2 (1) : 1
+0 2 0 0 0, 1 2 (1) : 1
+0 1 0 0 0, 1 1 (1) : 1
+0 0 0 3 0, 4 2 (1) : 1
+0 0 0 2 0, 5 2 (1) : 1
+0 0 0 1 0, 5 1 (1) : 1
+0 0 3 0 0, 0 3 (1) : 1
+0 0 2 0 0, 0 2 (1) : 1
+0 0 1 0 0, 0 1 (1) : 1

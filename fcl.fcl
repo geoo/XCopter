@@ -1,0 +1,117 @@
+// Block definition (there may be more than one block per file)
+FUNCTION_BLOCK helicopter
+
+// Define input variables
+VAR_INPUT
+    oben : REAL;
+    frontOben : REAL;
+	front : REAL;
+	frontUnten : REAL;
+	unten : REAL;
+END_VAR
+
+// Define output variable
+VAR_OUTPUT
+    auftrieb : REAL;
+	schub : REAL;
+END_VAR
+
+FUZZIFY oben
+    TERM nah := (-14,0) (-4,1) (15,1) (25,0); 
+    TERM mittel := (15,0) (25,1) (45,1) (55,0);
+    TERM weit := (45,0) (55,1) (75,1) (85,0);    
+	TERM sehr_weit := (75,0) (85,1) (110,1) (120,0);
+END_FUZZIFY
+
+FUZZIFY frontOben
+    TERM nah := (-14,0) (-4,1) (15,1) (25,0); 
+    TERM mittel := (15,0) (25,1) (45,1) (55,0);
+    TERM weit := (45,0) (55,1) (75,1) (85,0);    
+	TERM sehr_weit := (75,0) (85,1) (110,1) (120,0);
+END_FUZZIFY
+
+FUZZIFY front
+    TERM nah := (-14,0) (-4,1) (15,1) (25,0); 
+    TERM mittel := (15,0) (25,1) (45,1) (55,0);
+    TERM weit := (45,0) (55,1) (75,1) (85,0);    
+	TERM sehr_weit := (75,0) (85,1) (110,1) (120,0);
+END_FUZZIFY
+
+FUZZIFY frontUnten
+    TERM nah := (-14,0) (-4,1) (15,1) (25,0); 
+    TERM mittel := (15,0) (25,1) (45,1) (55,0);
+    TERM weit := (45,0) (55,1) (75,1) (85,0);    
+	TERM sehr_weit := (75,0) (85,1) (110,1) (120,0);
+END_FUZZIFY
+
+FUZZIFY unten
+    TERM nah := (-14,0) (-4,1) (15,1) (25,0); 
+    TERM mittel := (15,0) (25,1) (45,1) (55,0);
+    TERM weit := (45,0) (55,1) (75,1) (85,0);    
+	TERM sehr_weit := (75,0) (85,1) (110,1) (120,0);
+END_FUZZIFY
+
+DEFUZZIFY auftrieb
+    TERM starkerSinkflug := (-12,0) (-5,1) (5,1) (12,0);
+	TERM sinkflug := (5,0) (12,1) (22,1) (29,0);
+    TERM leichterSinkflug := (22,0) (29,1) (39,1) (45,0);
+    TERM hoeheBeibehalten := (39,0) (45,1) (55,1) (61,0);
+	TERM leichterAuftrieb := (55,0) (61,1) (71,1) (78,0);
+	TERM auftrieb := (71,0) (78,1) (88,1) (95,0);
+    TERM starkerAuftrieb := (88,0) (95,1) (105,1) (112,0);
+    // Use 'Center Of Gravity' defuzzification method
+    METHOD : COG;
+    // Default value is 0 (if no rule activates defuzzifier)
+    DEFAULT := 0;
+END_DEFUZZIFY
+
+DEFUZZIFY schub
+    TERM sehr_langsam := (-20,0) (-10,1) (10,1) (20,0);
+	TERM langsam := (10,0) (20,1) (45,1) (55,0);
+    TERM normal := (45,0) (55,1) (80,1) (85,0);
+	TERM schnell := (80,0) (90,1) (110,1) (120,0);
+    // Use 'Center Of Gravity' defuzzification method
+    METHOD : COG;
+    // Default value is 0 (if no rule activates defuzzifier)
+    DEFAULT := 0;
+END_DEFUZZIFY
+
+RULEBLOCK No1
+    // Use 'min' for 'and' (also implicit use 'max'
+    // for 'or' to fulfill DeMorgan's Law)
+    AND : MIN;
+    // Use 'min' activation method
+    ACT : MIN;
+    // Use 'max' accumulation method
+    ACCU : MAX;
+
+    RULE 1 : IF oben IS sehr_weit THEN auftrieb IS hoeheBeibehalten;
+    RULE 2 : IF oben IS weit THEN auftrieb IS leichterSinkflug;
+    RULE 3 : IF oben IS mittel THEN auftrieb IS sinkflug;
+    RULE 4 : IF oben IS nah THEN auftrieb IS starkerSinkflug;
+	RULE 5 : IF unten IS sehr_weit THEN auftrieb IS hoeheBeibehalten;
+	RULE 6 : IF unten IS weit THEN auftrieb IS leichterAuftrieb;
+	RULE 7 : IF unten IS mittel THEN auftrieb IS auftrieb;
+	RULE 8 : IF unten IS nah THEN auftrieb IS starkerAuftrieb;
+	RULE 9 : IF front IS sehr_weit THEN schub IS schnell;
+	RULE 10 : IF front IS weit THEN schub IS normal;
+	RULE 11 : IF front IS mittel THEN schub IS langsam;
+	RULE 12 : IF front IS nah THEN schub IS sehr_langsam;
+	RULE 13 : IF frontOben IS sehr_weit THEN auftrieb IS hoeheBeibehalten;
+	RULE 14 : IF frontOben IS weit THEN auftrieb IS leichterSinkflug;
+	RULE 15 : IF frontOben IS weit THEN schub IS normal;
+	RULE 16 : IF frontOben IS mittel THEN auftrieb IS sinkflug;
+	RULE 17 : IF frontOben IS mittel THEN schub IS langsam;
+	RULE 18 : IF frontOben IS nah THEN auftrieb IS starkerSinkflug;
+	RULE 19 : IF frontOben IS nah THEN schub IS sehr_langsam;
+	RULE 20 : IF frontUnten IS sehr_weit THEN auftrieb IS hoeheBeibehalten;
+	RULE 21 : IF frontUnten IS weit THEN auftrieb IS leichterAuftrieb;
+	RULE 22 : IF frontUnten IS weit THEN schub IS normal;
+	RULE 23 : IF frontUnten IS mittel THEN auftrieb IS auftrieb;
+	RULE 24 : IF frontUnten IS mittel THEN schub IS langsam;
+	RULE 25 : IF frontUnten IS nah THEN auftrieb IS starkerAuftrieb;
+	RULE 26 : IF frontUnten IS nah THEN schub IS sehr_langsam;
+
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
