@@ -10,29 +10,22 @@ import java.io.*;
 public class HelicopterForm implements MouseListener {
 
 	static Data data;
-	public static void main(String[] args) {
-		data=new Data();
-		Thread test= new Thread(new FisThread(data));
-		test.start();
-		
-		/*
-		FIS fis;
-		String fileName = "fcl.fcl";
-		fis = FIS.load(fileName, true);
-		fis.toStringFcl();
 
-		if (fis == null) { // Error while loading?
-			System.err.println("Can't load file: '" + fileName + "'");
-			return;
-		}
-		fis.chart();
-		fis.setVariable("oben", 100);
-		fis.setVariable("frontOben", 100);
-		fis.setVariable("front", 100);
-		fis.setVariable("frontUnten", 100);
-		fis.setVariable("unten", 100);
-		
-		*/
+	public static void main(String[] args) {
+		data = new Data();
+		Thread test = new Thread(new FisThread(data));
+		test.start();
+
+		/*
+		 * FIS fis; String fileName = "fcl.fcl"; fis = FIS.load(fileName, true);
+		 * fis.toStringFcl();
+		 * 
+		 * if (fis == null) { // Error while loading?
+		 * System.err.println("Can't load file: '" + fileName + "'"); return; }
+		 * fis.chart(); fis.setVariable("oben", 100);
+		 * fis.setVariable("frontOben", 100); fis.setVariable("front", 100);
+		 * fis.setVariable("frontUnten", 100); fis.setVariable("unten", 100);
+		 */
 		HelicopterForm a = new HelicopterForm();
 
 	}
@@ -151,7 +144,10 @@ public class HelicopterForm implements MouseListener {
 		bottomrecs = new ArrayList<MovingImage>();
 		smoke = new ArrayList<MovingImage>();
 
-		helicopter = new MovingImage("helicopter.GIF", XPOS, 270);
+		
+		//TODO
+		//Standart ypos war 270
+		helicopter = new MovingImage("helicopter.GIF", XPOS, 400);
 
 		for (int x = 0; x < NUMRECS; x++)
 			toprecs.add(new MovingImage("rec2.JPG", RECWIDTH * x, 30));
@@ -304,16 +300,18 @@ public class HelicopterForm implements MouseListener {
 
 	public boolean isHit() {
 		for (int x = 3; x <= 7; x++) {
-		
-		double test =Math.round(helicopter.getY()-RECHEIGHT-toprecs.get(x).getY());
-		data.setOben(test);
-		double test2 =Math.round((bottomrecs.get(x).getY())-(helicopter.getY() + 48));
-		data.setUnten(test2);
-		
-		// TODO
-		//	 System.out.println("entfernung unten: "
-		//	 +((bottomrecs.get(x).getY())-(helicopter.getY() + 48))+
-		//	 "               entfernung oben: "+((helicopter.getY()-RECHEIGHT-(toprecs.get(x).getY()))));
+
+			double test = Math.round(helicopter.getY() - RECHEIGHT
+					- toprecs.get(x).getY());
+			data.setOben(test);
+			double test2 = Math.round((bottomrecs.get(x).getY())
+					- (helicopter.getY() + 48));
+			data.setUnten(test2);
+
+			// TODO
+			// System.out.println("entfernung unten: "
+			// +((bottomrecs.get(x).getY())-(helicopter.getY() + 48))+
+			// "               entfernung oben: "+((helicopter.getY()-RECHEIGHT-(toprecs.get(x).getY()))));
 			if (helicopter.getY() + 48 >= bottomrecs.get(x).getY())
 				return true;
 		}
@@ -335,15 +333,14 @@ public class HelicopterForm implements MouseListener {
 		// TODO
 		if ((middlerecs.get(0).getY()) > (helicopter.getY() - 100)
 				&& (helicopter.getY() - 100) > (middlerecs.get(0).getY() - 100)) {
-		
+
 			data.setFront(middlerecs.get(0).getX() - 302);
-			//	System.out.println("MITTE: "+(middlerecs.get(0).getX() - 302));
-		}
-		else
+			// System.out.println("MITTE: "+(middlerecs.get(0).getX() - 302));
+		} else
 			data.setFront(0);
-		//System.out.println("MITTE: " + (middlerecs.get(0).getX() - 302)
-			//	+ "    " + (middlerecs.get(0).getY() - RECHEIGHT)
-			//	+ "    HELI: " + (helicopter.getY() - 100));
+		// System.out.println("MITTE: " + (middlerecs.get(0).getX() - 302)
+		// + "    " + (middlerecs.get(0).getY() - RECHEIGHT)
+		// + "    HELI: " + (helicopter.getY() - 100));
 		return middlecheck.intersects(coptercheck);
 	}
 
@@ -359,25 +356,28 @@ public class HelicopterForm implements MouseListener {
 
 	// moves the helicopter
 	public void updateCopter() {
-		upCount += .08;
-		if (goingUp) {
-			if (upCount < 3.5)
-				helicopter.setPosition(XPOS,
-						(double) (helicopter.getY() - (.3 + upCount)));
-			else
-				helicopter.setPosition(XPOS,
-						(double) (helicopter.getY() - (1.2 + upCount)));
-			helicopter.setImage("upCopter.GIF");
-		} else {
-			if (upCount < 1)
+		/*
+		 * upCount += .08; if (goingUp) { if (upCount < 3.5)
+		 * helicopter.setPosition(XPOS, (double) (helicopter.getY() - (.3 +
+		 * upCount))); else helicopter.setPosition(XPOS, (double)
+		 * (helicopter.getY() - (1.2 + upCount)));
+		 * helicopter.setImage("upCopter.GIF"); } else { if (upCount < 1)
+		 * 
+		 * helicopter.setPosition(XPOS, (double) (helicopter.getY() + upCount));
+		 * else helicopter.setPosition(XPOS, (double) (helicopter.getY() + (1.2
+		 * + upCount))); helicopter.setImage("helicopter.GIF"); }
+		 */
+		if (data.getAuftrieb() > 51) {
+			helicopter.setPosition(XPOS,
+					(double) (helicopter.getY() - (data.getAuftrieb() / 50)));
+		} else if (data.getAuftrieb() < 49) {
 
-				helicopter.setPosition(XPOS,
-						(double) (helicopter.getY() + upCount));
-			else
-				helicopter.setPosition(XPOS,
-						(double) (helicopter.getY() + (1.2 + upCount)));
-			helicopter.setImage("helicopter.GIF");
-		}
+			helicopter
+					.setPosition(
+							XPOS,
+							(double) (helicopter.getY() + ((data.getAuftrieb() + 50) / 50)));
+
+		} 
 		if (isHit())
 			crash();
 	}

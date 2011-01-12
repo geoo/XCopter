@@ -5,6 +5,7 @@ public class Data {
 	double front;
 	double frontUnten;
 	double frontOben;
+	double auftrieb;
 	
 	/**
 	 * @return the oben
@@ -75,5 +76,19 @@ public class Data {
 	 */
 	public void setFrontOben(double frontOben) {
 		this.frontOben = frontOben;
+	}
+
+	/**
+	 * @return the auftrieb
+	 */
+	public double getAuftrieb() {
+		return auftrieb;
+	}
+
+	/**
+	 * @param auftrieb the auftrieb to set
+	 */
+	public void setAuftrieb(double auftrieb) {
+		this.auftrieb = auftrieb;
 	}
 }

@@ -43,6 +43,7 @@ public class FisThread  extends Thread {
 
 		fis.evaluate();
 		System.out.println("VALUE: "+fis.getVariable("auftrieb").getLatestDefuzzifiedValue());
+		data.setAuftrieb(fis.getVariable("auftrieb").getLatestDefuzzifiedValue());
 		//fis.getVariable("auftrieb").chartDefuzzifier(true);
 }
 		//fis.evaluate();
