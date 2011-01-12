@@ -336,9 +336,11 @@ public class HelicopterForm implements MouseListener {
 		if ((middlerecs.get(0).getY()) > (helicopter.getY() - 100)
 				&& (helicopter.getY() - 100) > (middlerecs.get(0).getY() - 100)) {
 		
-			
+			data.setFront(middlerecs.get(0).getX() - 302);
 			//	System.out.println("MITTE: "+(middlerecs.get(0).getX() - 302));
 		}
+		else
+			data.setFront(0);
 		//System.out.println("MITTE: " + (middlerecs.get(0).getX() - 302)
 			//	+ "    " + (middlerecs.get(0).getY() - RECHEIGHT)
 			//	+ "    HELI: " + (helicopter.getY() - 100));

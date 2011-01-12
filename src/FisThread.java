@@ -38,7 +38,10 @@ public class FisThread  extends Thread {
 		System.out.println("DATA oben: "+data.getOben());
 		fis.setVariable("oben", data.getOben());
 		System.out.println("DATA unten: "+data.getUnten());
-		
+		fis.setVariable("unten", data.getUnten());
+		System.out.println("DATA front: "+data.getFront());
+		fis.setVariable("front", data.getFront());
+
 		fis.evaluate();
 		test.fireChartChanged();
 		//fis.getVariable("auftrieb").chartDefuzzifier(true);
