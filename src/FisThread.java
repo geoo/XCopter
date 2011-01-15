@@ -1,37 +1,32 @@
 import org.jfree.chart.JFreeChart;
 
 import net.sourceforge.jFuzzyLogic.FIS;
+import net.sourceforge.jFuzzyLogic.plot.JPanelFis;
 
 
-public class FisThread  extends Thread {
+public class FisThread extends Thread {
 	private FIS fis;
 	private Thread thread;
 	private Data data;
-	private JFreeChart test;
+	private JPanelFis chartPanel;
 	
-	public FisThread(Data data){
-		
+	public FisThread(Data data, FIS fis, JPanelFis chartPanel){
 		super();
+		this.chartPanel = chartPanel;
 		
 		this.data = data;
-		String fileName = "fcl.fcl";
-		fis = FIS.load(fileName, true);
-		fis.toStringFcl();
+		this.fis = fis;
 
-		if (fis == null) { // Error while loading?
-			System.err.println("Can't load file: '" + fileName + "'");
-			return;
-		}
-		fis.chart();
+		
 		fis.setVariable("oben", 100);
 		fis.setVariable("frontOben", 100);
 		fis.setVariable("front", 100);
 		fis.setVariable("frontUnten", 100);
 		fis.setVariable("unten", 100);
-		// fis.getFunctionBlock("helicopter").getVariable("oben").chart(true);
-		test = fis.getVariable("auftrieb").chartDefuzzifier(true);
+
 		start();
 	}
+	
 	public void run() {
 		while(true){
 		//System.out.println("DATA oben: "+data.getOben());
@@ -42,13 +37,11 @@ public class FisThread  extends Thread {
 		fis.setVariable("front", data.getFront());
 
 		fis.evaluate();
-		System.out.println("VALUE: "+fis.getVariable("auftrieb").getLatestDefuzzifiedValue());
+//		System.out.println("VALUE: "+fis.getVariable("auftrieb").getLatestDefuzzifiedValue());
 		data.setAuftrieb(fis.getVariable("auftrieb").getLatestDefuzzifiedValue());
+		chartPanel.repaint();
 		//fis.getVariable("auftrieb").chartDefuzzifier(true);
-}
-		//fis.evaluate();
-	//	fis.getVariable("auftrieb").chartDefuzzifier(true);
-		
+		}	
 	}
 	
 	public synchronized void setVariable(String name, double wert){

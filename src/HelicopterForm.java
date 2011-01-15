@@ -1,20 +1,17 @@
 import javax.swing.*;
 
-import net.sourceforge.jFuzzyLogic.FIS;
-
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 
-public class HelicopterForm implements MouseListener {
+public class HelicopterForm extends Thread implements MouseListener {
 
-	static Data data;
+	private Data data;
 
 	public static void main(String[] args) {
-		data = new Data();
-		Thread test = new Thread(new FisThread(data));
-		test.start();
+//		data = new Data();
+		
 
 		/*
 		 * FIS fis; String fileName = "fcl.fcl"; fis = FIS.load(fileName, true);
@@ -26,7 +23,7 @@ public class HelicopterForm implements MouseListener {
 		 * fis.setVariable("frontOben", 100); fis.setVariable("front", 100);
 		 * fis.setVariable("frontUnten", 100); fis.setVariable("unten", 100);
 		 */
-		HelicopterForm a = new HelicopterForm();
+//		HelicopterForm a = new HelicopterForm();
 
 	}
 
@@ -68,7 +65,9 @@ public class HelicopterForm implements MouseListener {
 	 * pixels high28 rectangles across that are 29 x 73
 	 */
 
-	public HelicopterForm() {
+	public HelicopterForm(Data data) {
+		super();
+		this.data = data;
 		NUMRECS = 28;
 		RECHEIGHT = 73;
 		RECWIDTH = 29;
@@ -77,7 +76,10 @@ public class HelicopterForm implements MouseListener {
 		maxDistance = 0;
 
 		load(new File("Best.txt"));
-
+		start();
+	}
+	
+	public void run() {
 		initiate();
 	}
 
@@ -93,6 +95,10 @@ public class HelicopterForm implements MouseListener {
 			System.out.println("Error. " + i);
 		}
 	}
+	
+	public JFrame getContainer() {
+		return this.background;
+	}
 
 	public void save() {
 		FileWriter out;
@@ -107,17 +113,7 @@ public class HelicopterForm implements MouseListener {
 
 	public void initiate() {
 		if (!playedOnce) {
-			background = new JFrame("Helicopter Game");
-			background.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // closes
-																		// the
-																		// program
-																		// when
-																		// the
-																		// window
-																		// is
-																		// closed
-			background.setResizable(false); // don't allow the user to resize
-											// the window
+			background = new JFrame();
 			background.setSize(new Dimension(818, 568));
 			background.setVisible(true);
 
