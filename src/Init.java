@@ -17,7 +17,6 @@ public class Init extends JApplet{
 	private FIS fis;
 	private JPanel boxPanel = new JPanel();
 	private Container container = getContentPane();
-	private Data data = new Data();
 	private JPanelFis chartPanel;
 	
 	public void loadFuzzyData() {
@@ -139,6 +138,12 @@ public class Init extends JApplet{
 		if (fis == null) { // Error while loading?
 			System.err.println("Can't load file: ''");
 		}	
+		
+		fis.setVariable("oben", 100);
+		fis.setVariable("frontOben", 100);
+		fis.setVariable("front", 100);
+		fis.setVariable("frontUnten", 100);
+		fis.setVariable("unten", 100);
 	}
 	
 	public void drawFuzzyCharts() {
@@ -147,7 +152,7 @@ public class Init extends JApplet{
 	}
 	
 	public void init() {
-		setSize(800, 800);
+		setSize(1150, 800);
 		
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
@@ -157,18 +162,15 @@ public class Init extends JApplet{
 					container.add(boxPanel);
 					
 					loadFuzzyData();
+					drawFuzzyCharts();
+					HelicopterForm helicopter;
+					Thread helicopterThread = new Thread(helicopter = new HelicopterForm(fis, chartPanel));	
+					boxPanel.add(helicopter.getContainer());
 				}
 			});
 		} catch (Exception e) {
 			System.out.println(e);
 		}
-
-		drawFuzzyCharts();
-		
-		
-		Thread fuzzyEngine = new Thread(new FisThread(data, fis, chartPanel));		
-
-		HelicopterForm helicopter = new HelicopterForm(data);
 	}
 	
 	public static void main(String[] args) {

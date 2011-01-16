@@ -1,13 +1,26 @@
-import javax.swing.*;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import net.sourceforge.jFuzzyLogic.FIS;
+import net.sourceforge.jFuzzyLogic.plot.JPanelFis;
 
 public class HelicopterForm extends Thread implements MouseListener {
 
-	private Data data;
+//	private Data data;
+	private FIS fis;
+	private JPanelFis chartPanel; 
 
 	public static void main(String[] args) {
 //		data = new Data();
@@ -27,7 +40,7 @@ public class HelicopterForm extends Thread implements MouseListener {
 
 	}
 
-	private JFrame background;
+	private JPanel background = new JPanel();
 	private Container container;
 	private JButton button;
 	private ImagePanel back;
@@ -65,9 +78,11 @@ public class HelicopterForm extends Thread implements MouseListener {
 	 * pixels high28 rectangles across that are 29 x 73
 	 */
 
-	public HelicopterForm(Data data) {
+	public HelicopterForm(FIS fis, JPanelFis chartPanel) {
 		super();
-		this.data = data;
+//		this.data = data;
+		this.fis = fis;
+		this.chartPanel = chartPanel;
 		NUMRECS = 28;
 		RECHEIGHT = 73;
 		RECWIDTH = 29;
@@ -96,7 +111,7 @@ public class HelicopterForm extends Thread implements MouseListener {
 		}
 	}
 	
-	public JFrame getContainer() {
+	public JPanel getContainer() {
 		return this.background;
 	}
 
@@ -113,7 +128,6 @@ public class HelicopterForm extends Thread implements MouseListener {
 
 	public void initiate() {
 		if (!playedOnce) {
-			background = new JFrame();
 			background.setSize(new Dimension(818, 568));
 			background.setVisible(true);
 
@@ -299,11 +313,13 @@ public class HelicopterForm extends Thread implements MouseListener {
 
 			double test = Math.round(helicopter.getY() - RECHEIGHT
 					- toprecs.get(x).getY());
-			data.setOben(test);
+			fis.setVariable("oben", test);
 			double test2 = Math.round((bottomrecs.get(x).getY())
 					- (helicopter.getY() + 48));
-			data.setUnten(test2);
-
+			fis.setVariable("unten", test2);
+			
+			fis.evaluate();
+//			chartPanel.repaint();
 			// TODO
 			// System.out.println("entfernung unten: "
 			// +((bottomrecs.get(x).getY())-(helicopter.getY() + 48))+
@@ -330,10 +346,13 @@ public class HelicopterForm extends Thread implements MouseListener {
 		if ((middlerecs.get(0).getY()) > (helicopter.getY() - 100)
 				&& (helicopter.getY() - 100) > (middlerecs.get(0).getY() - 100)) {
 
-			data.setFront(middlerecs.get(0).getX() - 302);
+			fis.setVariable("front", (middlerecs.get(0).getX() - 302));
 			// System.out.println("MITTE: "+(middlerecs.get(0).getX() - 302));
-		} else
-			data.setFront(0);
+		} else {
+			fis.setVariable("front", 0);
+		}
+		fis.evaluate();
+//		chartPanel.repaint();
 		// System.out.println("MITTE: " + (middlerecs.get(0).getX() - 302)
 		// + "    " + (middlerecs.get(0).getY() - RECHEIGHT)
 		// + "    HELI: " + (helicopter.getY() - 100));
@@ -363,15 +382,15 @@ public class HelicopterForm extends Thread implements MouseListener {
 		 * else helicopter.setPosition(XPOS, (double) (helicopter.getY() + (1.2
 		 * + upCount))); helicopter.setImage("helicopter.GIF"); }
 		 */
-		if (data.getAuftrieb() > 51) {
+		if (fis.getVariable("auftrieb").getLatestDefuzzifiedValue() > 51) {
 			helicopter.setPosition(XPOS,
-					(double) (helicopter.getY() - (data.getAuftrieb() / 50)));
-		} else if (data.getAuftrieb() < 49) {
+					(double) (helicopter.getY() - (fis.getVariable("auftrieb").getLatestDefuzzifiedValue() / 50)));
+		} else if (fis.getVariable("auftrieb").getLatestDefuzzifiedValue() < 49) {
 
 			helicopter
 					.setPosition(
 							XPOS,
-							(double) (helicopter.getY() + ((data.getAuftrieb() + 50) / 50)));
+							(double) (helicopter.getY() + ((fis.getVariable("auftrieb").getLatestDefuzzifiedValue() + 50) / 50)));
 
 		} 
 		if (isHit())
