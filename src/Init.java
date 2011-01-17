@@ -1,4 +1,5 @@
 import java.awt.Container;
+import java.awt.Dimension;
 
 import javax.swing.BoxLayout;
 import javax.swing.JApplet;
@@ -6,7 +7,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.jFuzzyLogic.FIS;
-import net.sourceforge.jFuzzyLogic.plot.JPanelFis;
 
 import org.antlr.runtime.RecognitionException;
 
@@ -17,7 +17,6 @@ public class Init extends JApplet{
 	private FIS fis;
 	private JPanel boxPanel = new JPanel();
 	private Container container = getContentPane();
-	private JPanelFis chartPanel;
 	
 	public void loadFuzzyData() {
 		String fcl = "FUNCTION_BLOCK helicopter\n" +
@@ -144,27 +143,25 @@ public class Init extends JApplet{
 		fis.setVariable("front", 100);
 		fis.setVariable("frontUnten", 100);
 		fis.setVariable("unten", 100);
+		fis.evaluate();
 	}
 	
-	public void drawFuzzyCharts() {
-		chartPanel = new JPanelFis(fis);
-		boxPanel.add(chartPanel);
-	}
-	
-	public void init() {
-		setSize(1150, 800);
-		
+	public void init() {		
+		setSize(new Dimension(1300, 800));
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
 				public void run() {
-					boxPanel.setLayout(new BoxLayout(boxPanel, BoxLayout.LINE_AXIS));
-					
+					boxPanel.setLayout(new BoxLayout(boxPanel, BoxLayout.X_AXIS));
 					container.add(boxPanel);
-					
 					loadFuzzyData();
-					drawFuzzyCharts();
-					HelicopterForm helicopter;
-					Thread helicopterThread = new Thread(helicopter = new HelicopterForm(fis, chartPanel));	
+					
+					ChartPanel chartPanel;
+					new Thread(chartPanel = new ChartPanel(fis));
+					
+					Helicopter helicopter;
+					new Thread(helicopter = new Helicopter(fis, chartPanel));	
+					
+					boxPanel.add(chartPanel.getChartPanel());
 					boxPanel.add(helicopter.getContainer());
 				}
 			});
@@ -174,7 +171,7 @@ public class Init extends JApplet{
 	}
 	
 	public static void main(String[] args) {
-
+		
 	}
 
 }

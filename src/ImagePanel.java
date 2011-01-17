@@ -3,6 +3,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.net.URL;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
@@ -18,7 +19,7 @@ class ImagePanel extends JPanel {
 	private ArrayList<MovingImage> smoke;
  
 	//Constructs a new ImagePanel with the background image specified by the file path given
-  	public ImagePanel(String img) 
+  	public ImagePanel(URL img) 
   	{
   		this(new ImageIcon(img).getImage());	
   			//The easiest way to make images from file paths in Swing
@@ -61,27 +62,7 @@ class ImagePanel extends JPanel {
     		g.drawImage(img.getImage(), (int)(img.getX()), (int)(img.getY()), null);
     	if(copter != null)
     		g.drawImage(copter.getImage(), (int)(copter.getX()), (int)(copter.getY()), null);
-    	drawStrings(g);
   	}
- 
- 	public void drawStrings(Graphics g)
- 	{
- 		g.setFont(new Font("Arial",Font.BOLD,20));
-    	g.drawString("Distance: " + HelicopterForm.distance,30,500);
-    	g.setFont(new Font("Arial",Font.BOLD,20));
-    	if (HelicopterForm.distance > HelicopterForm.maxDistance)
-    		g.drawString("Best: " + HelicopterForm.distance,650,500);
-    	else
-    		g.drawString("Best: " + HelicopterForm.maxDistance,650,500);
-    	if(HelicopterForm.paused)
-    	{
-	    		g.setColor(Color.WHITE);
-	    		g.setFont(new Font("Chiller",Font.BOLD,72));
-	    		g.drawString("Paused",325,290);
-	    		g.setFont(new Font("Chiller",Font.BOLD,30));
-	    		g.drawString("Click to unpause.",320,340);
-    	}
- 	}
  
   	//Replaces the list of foreground images with the one given, and repaints the panel
   	public void updateImages(ArrayList<MovingImage> newTop,ArrayList<MovingImage> newMiddle,ArrayList<MovingImage> newBottom,MovingImage newCopter,ArrayList<MovingImage> newSmoke)

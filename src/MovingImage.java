@@ -1,4 +1,5 @@
 import java.awt.Image;
+import java.net.URL;
 
 import javax.swing.ImageIcon;
 
@@ -17,10 +18,9 @@ class MovingImage
 	}
  
 	//Construct a new Moving Image with image (from file path), x position, and y position given
-	public MovingImage(String path, double xPos, double yPos)
+	public MovingImage(URL path, double xPos, double yPos)
 	{
-		this(new ImageIcon(path).getImage(), xPos, yPos);	
-			//easiest way to make an image from a file path in Swing
+		this(new ImageIcon(path).getImage(), xPos, yPos);
 	}
  
 	//They are set methods.  I don't feel like commenting them.
@@ -30,7 +30,7 @@ class MovingImage
 		y = yPos;
 	}
  
-	public void setImage(String path)
+	public void setImage(URL path)
 	{
 		image = new ImageIcon(path).getImage();
 	}

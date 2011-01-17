@@ -9,18 +9,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sourceforge.jFuzzyLogic.FIS;
 import net.sourceforge.jFuzzyLogic.plot.JPanelFis;
 
-public class HelicopterForm extends Thread implements MouseListener {
+public class Helicopter extends Thread implements MouseListener {
 
 //	private Data data;
 	private FIS fis;
-	private JPanelFis chartPanel; 
+	private ChartPanel chartPanel; 
 
 	public static void main(String[] args) {
 //		data = new Data();
@@ -41,11 +43,10 @@ public class HelicopterForm extends Thread implements MouseListener {
 	}
 
 	private JPanel background = new JPanel();
-	private Container container;
-	private JButton button;
+//	private Container container;
+//	private JButton button;
 	private ImagePanel back;
 
-	public static boolean paused;
 	public static boolean crashed;
 	public static boolean started;
 	public static boolean playedOnce;
@@ -78,9 +79,8 @@ public class HelicopterForm extends Thread implements MouseListener {
 	 * pixels high28 rectangles across that are 29 x 73
 	 */
 
-	public HelicopterForm(FIS fis, JPanelFis chartPanel) {
+	public Helicopter(FIS fis, ChartPanel chartPanel) {
 		super();
-//		this.data = data;
 		this.fis = fis;
 		this.chartPanel = chartPanel;
 		NUMRECS = 28;
@@ -89,41 +89,15 @@ public class HelicopterForm extends Thread implements MouseListener {
 		XPOS = 200;
 		playedOnce = false;
 		maxDistance = 0;
-
-		load(new File("Best.txt"));
 		start();
 	}
 	
 	public void run() {
 		initiate();
 	}
-
-	public void load(File file) {
-		try {
-			Scanner reader = new Scanner(file);
-			while (reader.hasNext()) {
-				int value = reader.nextInt();
-				if (value > maxDistance)
-					maxDistance = value;
-			}
-		} catch (IOException i) {
-			System.out.println("Error. " + i);
-		}
-	}
 	
 	public JPanel getContainer() {
 		return this.background;
-	}
-
-	public void save() {
-		FileWriter out;
-		try {
-			out = new FileWriter("Best.txt");
-			out.write("" + maxDistance);
-			out.close();
-		} catch (IOException i) {
-			System.out.println("Error: " + i.getMessage());
-		}
 	}
 
 	public void initiate() {
@@ -131,14 +105,13 @@ public class HelicopterForm extends Thread implements MouseListener {
 			background.setSize(new Dimension(818, 568));
 			background.setVisible(true);
 
-			back = new ImagePanel("back.JPG");
+			back = new ImagePanel(this.getClass().getResource("back.JPG"));
 			background.add(back);
 
 			back.addMouseListener(this);
 		}
 		playedOnce = true;
 		goingUp = false;
-		paused = false;
 		crashed = false;
 		started = false;
 
@@ -157,15 +130,15 @@ public class HelicopterForm extends Thread implements MouseListener {
 		
 		//TODO
 		//Standart ypos war 270
-		helicopter = new MovingImage("helicopter.GIF", XPOS, 400);
+		helicopter = new MovingImage(this.getClass().getResource("helicopter.png"), XPOS, 400);
 
 		for (int x = 0; x < NUMRECS; x++)
-			toprecs.add(new MovingImage("rec2.JPG", RECWIDTH * x, 30));
+			toprecs.add(new MovingImage(this.getClass().getResource("rec2.JPG"), RECWIDTH * x, 30));
 		for (int x = 0; x < NUMRECS; x++)
-			bottomrecs.add(new MovingImage("rec2.JPG", RECWIDTH * x, 450));
+			bottomrecs.add(new MovingImage(this.getClass().getResource("rec2.JPG"), RECWIDTH * x, 450));
 
-		middlerecs.add(new MovingImage("rec2.JPG", 1392, randomMidHeight()));
-		middlerecs.add(new MovingImage("rec2.JPG", 1972, randomMidHeight()));
+		middlerecs.add(new MovingImage(this.getClass().getResource("rec2.JPG"), 1392, randomMidHeight()));
+		middlerecs.add(new MovingImage(this.getClass().getResource("rec2.JPG"), 1972, randomMidHeight()));
 
 		drawRectangles();
 	}
@@ -174,12 +147,11 @@ public class HelicopterForm extends Thread implements MouseListener {
 		long last = System.currentTimeMillis();
 		long lastCopter = System.currentTimeMillis();
 		long lastSmoke = System.currentTimeMillis();
-		long lastSound = System.currentTimeMillis();
+//		long lastSound = System.currentTimeMillis();
 		int firstUpdates = 0;
 		double lastDistance = (double) System.currentTimeMillis();
 		while (true) {
-			if (!paused
-					&& !crashed
+			if (!crashed
 					&& started
 					&& (double) System.currentTimeMillis()
 							- (double) (2900 / 40) > lastDistance) {
@@ -193,31 +165,31 @@ public class HelicopterForm extends Thread implements MouseListener {
 			 * move.play(); }
 			 */
 
-			if (!paused && !crashed && started
+			if (!crashed && started
 					&& System.currentTimeMillis() - 10 > lastCopter) {
 				lastCopter = System.currentTimeMillis();
 				updateCopter();
 				updateMiddle();
 			}
-			if (!paused && !crashed && started
+			if (!crashed && started
 					&& System.currentTimeMillis() - 100 > last) {
 				last = System.currentTimeMillis();
 				updateRecs();
 			}
-			if (!paused && !crashed && started
+			if (!crashed && started
 					&& System.currentTimeMillis() - 75 > lastSmoke) {
 				lastSmoke = System.currentTimeMillis();
 				if (firstUpdates < numSmoke) {
 					firstUpdates++;
-					smoke.add(new MovingImage("smoke.GIF", 187, helicopter
+					smoke.add(new MovingImage(this.getClass().getResource("smoke.GIF"), 187, helicopter
 							.getY()));
 					for (int x = 0; x < firstUpdates; x++)
-						smoke.set(x, new MovingImage("smoke.GIF", smoke.get(x)
+						smoke.set(x, new MovingImage(this.getClass().getResource("smoke.GIF"), smoke.get(x)
 								.getX() - 12, smoke.get(x).getY()));
 				} else {
 					for (int x = 0; x < numSmoke - 1; x++)
 						smoke.get(x).setY(smoke.get(x + 1).getY());
-					smoke.set(numSmoke - 1, new MovingImage("smoke.GIF", 187,
+					smoke.set(numSmoke - 1, new MovingImage(this.getClass().getResource("smoke.GIF"), 187,
 							helicopter.getY()));
 				}
 			}
@@ -230,9 +202,9 @@ public class HelicopterForm extends Thread implements MouseListener {
 		for (int x = 0; x < (NUMRECS - 1); x++) // move all but the last
 												// rectangle 1 spot to the left
 		{
-			toprecs.set(x, new MovingImage("rec2.JPG", RECWIDTH * x, toprecs
+			toprecs.set(x, new MovingImage(this.getClass().getResource("rec2.JPG"), RECWIDTH * x, toprecs
 					.get(x + 1).getY()));
-			bottomrecs.set(x, new MovingImage("rec2.JPG", RECWIDTH * x,
+			bottomrecs.set(x, new MovingImage(this.getClass().getResource("rec2.JPG"), RECWIDTH * x,
 					bottomrecs.get(x + 1).getY()));
 		}
 		lastRec();
@@ -265,16 +237,16 @@ public class HelicopterForm extends Thread implements MouseListener {
 	}
 
 	public void moveDown() {
-		toprecs.set((NUMRECS - 1), new MovingImage("rec2.JPG", RECWIDTH
+		toprecs.set((NUMRECS - 1), new MovingImage(this.getClass().getResource("rec2.JPG"), RECWIDTH
 				* (NUMRECS - 1), toprecs.get(26).getY() + moveIncrement));
-		bottomrecs.set((NUMRECS - 1), new MovingImage("rec2.JPG", RECWIDTH
+		bottomrecs.set((NUMRECS - 1), new MovingImage(this.getClass().getResource("rec2.JPG"), RECWIDTH
 				* (NUMRECS - 1), bottomrecs.get(26).getY() + moveIncrement));
 	}
 
 	public void moveUp() {
-		bottomrecs.set((NUMRECS - 1), new MovingImage("rec2.JPG", RECWIDTH
+		bottomrecs.set((NUMRECS - 1), new MovingImage(this.getClass().getResource("rec2.JPG"), RECWIDTH
 				* (NUMRECS - 1), bottomrecs.get(26).getY() - moveIncrement));
-		toprecs.set((NUMRECS - 1), new MovingImage("rec2.JPG", RECWIDTH
+		toprecs.set((NUMRECS - 1), new MovingImage(this.getClass().getResource("rec2.JPG"), RECWIDTH
 				* (NUMRECS - 1), toprecs.get(26).getY() - moveIncrement));
 	}
 
@@ -296,21 +268,22 @@ public class HelicopterForm extends Thread implements MouseListener {
 	// moves the randomly generated middle rectangles
 	public void updateMiddle() {
 		if (middlerecs.get(0).getX() > -1 * RECWIDTH) {
-			middlerecs.set(0, new MovingImage("rec2.JPG", middlerecs.get(0)
+			middlerecs.set(0, new MovingImage(this.getClass().getResource("rec2.JPG"), middlerecs.get(0)
 					.getX() - (RECWIDTH / 5), middlerecs.get(0).getY()));
-			middlerecs.set(1, new MovingImage("rec2.JPG", middlerecs.get(1)
+			middlerecs.set(1, new MovingImage(this.getClass().getResource("rec2.JPG"), middlerecs.get(1)
 					.getX() - (RECWIDTH / 5), middlerecs.get(1).getY()));
 		} else {
-			middlerecs.set(0, new MovingImage("rec2.JPG", middlerecs.get(1)
+			middlerecs.set(0, new MovingImage(this.getClass().getResource("rec2.JPG"), middlerecs.get(1)
 					.getX() - (RECWIDTH / 5), middlerecs.get(1).getY()));
-			middlerecs.set(1, new MovingImage("rec2.JPG", middlerecs.get(0)
+			middlerecs.set(1, new MovingImage(this.getClass().getResource("rec2.JPG"), middlerecs.get(0)
 					.getX() + 580, randomMidHeight()));
 		}
 	}
 
 	public boolean isHit() {
 		for (int x = 3; x <= 7; x++) {
-
+			double auftriebTemp = fis.getVariable("auftrieb").getLatestDefuzzifiedValue();
+			
 			double test = Math.round(helicopter.getY() - RECHEIGHT
 					- toprecs.get(x).getY());
 			fis.setVariable("oben", test);
@@ -319,7 +292,11 @@ public class HelicopterForm extends Thread implements MouseListener {
 			fis.setVariable("unten", test2);
 			
 			fis.evaluate();
-//			chartPanel.repaint();
+			
+//			if(((auftriebTemp - fis.getVariable("auftrieb").getLatestDefuzzifiedValue()) > 1) || (auftriebTemp - fis.getVariable("auftrieb").getLatestDefuzzifiedValue()) < -1) {
+//				chartPanel.update();
+//			}
+
 			// TODO
 			// System.out.println("entfernung unten: "
 			// +((bottomrecs.get(x).getY())-(helicopter.getY() + 48))+
@@ -343,6 +320,7 @@ public class HelicopterForm extends Thread implements MouseListener {
 				(int) helicopter.getY(), 106, 48);
 
 		// TODO
+		
 		if ((middlerecs.get(0).getY()) > (helicopter.getY() - 100)
 				&& (helicopter.getY() - 100) > (middlerecs.get(0).getY() - 100)) {
 
@@ -351,8 +329,10 @@ public class HelicopterForm extends Thread implements MouseListener {
 		} else {
 			fis.setVariable("front", 0);
 		}
+		
+		
 		fis.evaluate();
-//		chartPanel.repaint();
+		
 		// System.out.println("MITTE: " + (middlerecs.get(0).getX() - 302)
 		// + "    " + (middlerecs.get(0).getY() - RECHEIGHT)
 		// + "    HELI: " + (helicopter.getY() - 100));
@@ -363,7 +343,6 @@ public class HelicopterForm extends Thread implements MouseListener {
 		crashed = true;
 		if (distance > maxDistance) {
 			maxDistance = distance;
-			save();
 		}
 
 		initiate();
@@ -382,6 +361,7 @@ public class HelicopterForm extends Thread implements MouseListener {
 		 * else helicopter.setPosition(XPOS, (double) (helicopter.getY() + (1.2
 		 * + upCount))); helicopter.setImage("helicopter.GIF"); }
 		 */
+//		chartPanel.repaint();
 		if (fis.getVariable("auftrieb").getLatestDefuzzifiedValue() > 51) {
 			helicopter.setPosition(XPOS,
 					(double) (helicopter.getY() - (fis.getVariable("auftrieb").getLatestDefuzzifiedValue() / 50)));
@@ -400,11 +380,6 @@ public class HelicopterForm extends Thread implements MouseListener {
 	// Called when the mouse exits the game window
 	public void mouseExited(MouseEvent e) {
 
-		if (started) {
-			paused = true;
-			// move.close();
-		}
-
 	}
 
 	// Called when the mouse enters the game window
@@ -416,8 +391,6 @@ public class HelicopterForm extends Thread implements MouseListener {
 	public void mouseReleased(MouseEvent e) {
 		goingUp = false;
 		upCount = 0;
-		if (paused)
-			paused = false;
 	}
 
 	// Called when the mouse is pressed
