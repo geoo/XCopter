@@ -1,32 +1,18 @@
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sourceforge.jFuzzyLogic.FIS;
-import net.sourceforge.jFuzzyLogic.plot.JPanelFis;
 
-public class Helicopter extends Thread implements MouseListener {
+public class Helicopter extends Thread {
 
-//	private Data data;
+	// private Data data;
 	private FIS fis;
-	private ChartPanel chartPanel; 
+	private ChartPanel chartPanel;
 
 	public static void main(String[] args) {
-//		data = new Data();
-		
 
 		/*
 		 * FIS fis; String fileName = "fcl.fcl"; fis = FIS.load(fileName, true);
@@ -38,13 +24,13 @@ public class Helicopter extends Thread implements MouseListener {
 		 * fis.setVariable("frontOben", 100); fis.setVariable("front", 100);
 		 * fis.setVariable("frontUnten", 100); fis.setVariable("unten", 100);
 		 */
-//		HelicopterForm a = new HelicopterForm();
+		// HelicopterForm a = new HelicopterForm();
 
 	}
 
 	private JPanel background = new JPanel();
-//	private Container container;
-//	private JButton button;
+	// private Container container;
+	// private JButton button;
 	private ImagePanel back;
 
 	public static boolean crashed;
@@ -52,7 +38,6 @@ public class Helicopter extends Thread implements MouseListener {
 	public static boolean playedOnce;
 
 	public boolean goingUp;
-	private double upCount;
 
 	public static int distance;
 	public static int maxDistance;
@@ -65,19 +50,12 @@ public class Helicopter extends Thread implements MouseListener {
 	private int moveIncrement;
 	private int numSmoke;
 
-	private ArrayList<MovingImage> toprecs;
-	private ArrayList<MovingImage> bottomrecs;
-	private ArrayList<MovingImage> middlerecs;
-	private ArrayList<MovingImage> recs;
-	private ArrayList<MovingImage> smoke;
-	private MovingImage helicopter;
-
-	// private MP3 move = new MP3("HelicopterSound.mp3");
-
-	/*
-	 * Graphics information:Background is 812 x 537Floor is 74 and Ceiling is 72
-	 * pixels high28 rectangles across that are 29 x 73
-	 */
+	private ArrayList<BeweglichesBild> toprecs;
+	private ArrayList<BeweglichesBild> bottomrecs;
+	private ArrayList<BeweglichesBild> middlerecs;
+	private ArrayList<BeweglichesBild> recs;
+	private ArrayList<BeweglichesBild> smoke;
+	private BeweglichesBild helicopter;
 
 	public Helicopter(FIS fis, ChartPanel chartPanel) {
 		super();
@@ -91,11 +69,11 @@ public class Helicopter extends Thread implements MouseListener {
 		maxDistance = 0;
 		start();
 	}
-	
+
 	public void run() {
 		initiate();
 	}
-	
+
 	public JPanel getContainer() {
 		return this.background;
 	}
@@ -108,37 +86,35 @@ public class Helicopter extends Thread implements MouseListener {
 			back = new ImagePanel(this.getClass().getResource("back.JPG"));
 			background.add(back);
 
-			back.addMouseListener(this);
 		}
 		playedOnce = true;
 		goingUp = false;
 		crashed = false;
-		started = false;
-
-		distance = 0;
-		upCount = 0;
+		started = true;
 
 		moveIncrement = 2;
 		numSmoke = 15;
 
-		recs = new ArrayList<MovingImage>();
-		toprecs = new ArrayList<MovingImage>();
-		middlerecs = new ArrayList<MovingImage>();
-		bottomrecs = new ArrayList<MovingImage>();
-		smoke = new ArrayList<MovingImage>();
+		recs = new ArrayList<BeweglichesBild>();
+		toprecs = new ArrayList<BeweglichesBild>();
+		middlerecs = new ArrayList<BeweglichesBild>();
+		bottomrecs = new ArrayList<BeweglichesBild>();
+		smoke = new ArrayList<BeweglichesBild>();
 
-		
-		//TODO
-		//Standart ypos war 270
-		helicopter = new MovingImage(this.getClass().getResource("helicopter.png"), XPOS, 400);
+		helicopter = new BeweglichesBild(this.getClass().getResource(
+				"helicopter.png"), XPOS, 270);
 
 		for (int x = 0; x < NUMRECS; x++)
-			toprecs.add(new MovingImage(this.getClass().getResource("rec2.JPG"), RECWIDTH * x, 30));
+			toprecs.add(new BeweglichesBild(this.getClass().getResource(
+					"rec2.JPG"), RECWIDTH * x, 30));
 		for (int x = 0; x < NUMRECS; x++)
-			bottomrecs.add(new MovingImage(this.getClass().getResource("rec2.JPG"), RECWIDTH * x, 450));
+			bottomrecs.add(new BeweglichesBild(this.getClass().getResource(
+					"rec2.JPG"), RECWIDTH * x, 450));
 
-		middlerecs.add(new MovingImage(this.getClass().getResource("rec2.JPG"), 1392, randomMidHeight()));
-		middlerecs.add(new MovingImage(this.getClass().getResource("rec2.JPG"), 1972, randomMidHeight()));
+		middlerecs.add(new BeweglichesBild(this.getClass().getResource(
+				"rec2.JPG"), 1392, randomMidHeight()));
+		middlerecs.add(new BeweglichesBild(this.getClass().getResource(
+				"rec2.JPG"), 1972, randomMidHeight()));
 
 		drawRectangles();
 	}
@@ -147,7 +123,6 @@ public class Helicopter extends Thread implements MouseListener {
 		long last = System.currentTimeMillis();
 		long lastCopter = System.currentTimeMillis();
 		long lastSmoke = System.currentTimeMillis();
-//		long lastSound = System.currentTimeMillis();
 		int firstUpdates = 0;
 		double lastDistance = (double) System.currentTimeMillis();
 		while (true) {
@@ -159,20 +134,13 @@ public class Helicopter extends Thread implements MouseListener {
 				distance++;
 			}
 
-			/*
-			 * if(!paused && !crashed && started && System.currentTimeMillis() -
-			 * 1300 > lastSound) { lastSound = System.currentTimeMillis();
-			 * move.play(); }
-			 */
-
 			if (!crashed && started
 					&& System.currentTimeMillis() - 10 > lastCopter) {
 				lastCopter = System.currentTimeMillis();
 				updateCopter();
 				updateMiddle();
 			}
-			if (!crashed && started
-					&& System.currentTimeMillis() - 100 > last) {
+			if (!crashed && started && System.currentTimeMillis() - 100 > last) {
 				last = System.currentTimeMillis();
 				updateRecs();
 			}
@@ -181,16 +149,17 @@ public class Helicopter extends Thread implements MouseListener {
 				lastSmoke = System.currentTimeMillis();
 				if (firstUpdates < numSmoke) {
 					firstUpdates++;
-					smoke.add(new MovingImage(this.getClass().getResource("smoke.GIF"), 187, helicopter
-							.getY()));
+					smoke.add(new BeweglichesBild(this.getClass().getResource(
+							"smoke.GIF"), 187, helicopter.getY()));
 					for (int x = 0; x < firstUpdates; x++)
-						smoke.set(x, new MovingImage(this.getClass().getResource("smoke.GIF"), smoke.get(x)
-								.getX() - 12, smoke.get(x).getY()));
+						smoke.set(x, new BeweglichesBild(this.getClass()
+								.getResource("smoke.GIF"),
+								smoke.get(x).getX() - 12, smoke.get(x).getY()));
 				} else {
 					for (int x = 0; x < numSmoke - 1; x++)
 						smoke.get(x).setY(smoke.get(x + 1).getY());
-					smoke.set(numSmoke - 1, new MovingImage(this.getClass().getResource("smoke.GIF"), 187,
-							helicopter.getY()));
+					smoke.set(numSmoke - 1, new BeweglichesBild(this.getClass()
+							.getResource("smoke.GIF"), 187, helicopter.getY()));
 				}
 			}
 			back.updateImages(toprecs, middlerecs, bottomrecs, helicopter,
@@ -202,10 +171,14 @@ public class Helicopter extends Thread implements MouseListener {
 		for (int x = 0; x < (NUMRECS - 1); x++) // move all but the last
 												// rectangle 1 spot to the left
 		{
-			toprecs.set(x, new MovingImage(this.getClass().getResource("rec2.JPG"), RECWIDTH * x, toprecs
-					.get(x + 1).getY()));
-			bottomrecs.set(x, new MovingImage(this.getClass().getResource("rec2.JPG"), RECWIDTH * x,
-					bottomrecs.get(x + 1).getY()));
+			toprecs.set(x,
+					new BeweglichesBild(
+							this.getClass().getResource("rec2.JPG"), RECWIDTH
+									* x, toprecs.get(x + 1).getY()));
+			bottomrecs.set(x,
+					new BeweglichesBild(
+							this.getClass().getResource("rec2.JPG"), RECWIDTH
+									* x, bottomrecs.get(x + 1).getY()));
 		}
 		lastRec();
 	}
@@ -237,17 +210,21 @@ public class Helicopter extends Thread implements MouseListener {
 	}
 
 	public void moveDown() {
-		toprecs.set((NUMRECS - 1), new MovingImage(this.getClass().getResource("rec2.JPG"), RECWIDTH
-				* (NUMRECS - 1), toprecs.get(26).getY() + moveIncrement));
-		bottomrecs.set((NUMRECS - 1), new MovingImage(this.getClass().getResource("rec2.JPG"), RECWIDTH
-				* (NUMRECS - 1), bottomrecs.get(26).getY() + moveIncrement));
+		toprecs.set((NUMRECS - 1), new BeweglichesBild(this.getClass()
+				.getResource("rec2.JPG"), RECWIDTH * (NUMRECS - 1), toprecs
+				.get(26).getY() + moveIncrement));
+		bottomrecs.set((NUMRECS - 1), new BeweglichesBild(this.getClass()
+				.getResource("rec2.JPG"), RECWIDTH * (NUMRECS - 1), bottomrecs
+				.get(26).getY() + moveIncrement));
 	}
 
 	public void moveUp() {
-		bottomrecs.set((NUMRECS - 1), new MovingImage(this.getClass().getResource("rec2.JPG"), RECWIDTH
-				* (NUMRECS - 1), bottomrecs.get(26).getY() - moveIncrement));
-		toprecs.set((NUMRECS - 1), new MovingImage(this.getClass().getResource("rec2.JPG"), RECWIDTH
-				* (NUMRECS - 1), toprecs.get(26).getY() - moveIncrement));
+		bottomrecs.set((NUMRECS - 1), new BeweglichesBild(this.getClass()
+				.getResource("rec2.JPG"), RECWIDTH * (NUMRECS - 1), bottomrecs
+				.get(26).getY() - moveIncrement));
+		toprecs.set((NUMRECS - 1), new BeweglichesBild(this.getClass()
+				.getResource("rec2.JPG"), RECWIDTH * (NUMRECS - 1), toprecs
+				.get(26).getY() - moveIncrement));
 	}
 
 	public int randomMidHeight() {
@@ -265,42 +242,58 @@ public class Helicopter extends Thread implements MouseListener {
 		return min + (int) (Math.random() * max);
 	}
 
+	// TODO
 	// moves the randomly generated middle rectangles
 	public void updateMiddle() {
+
+		double schub = fis.getVariable("schub").getLatestDefuzzifiedValue();
+		
 		if (middlerecs.get(0).getX() > -1 * RECWIDTH) {
-			middlerecs.set(0, new MovingImage(this.getClass().getResource("rec2.JPG"), middlerecs.get(0)
-					.getX() - (RECWIDTH / 5), middlerecs.get(0).getY()));
-			middlerecs.set(1, new MovingImage(this.getClass().getResource("rec2.JPG"), middlerecs.get(1)
-					.getX() - (RECWIDTH / 5), middlerecs.get(1).getY()));
+			middlerecs.set(0,
+					new BeweglichesBild(
+							this.getClass().getResource("rec2.JPG"), middlerecs
+									.get(0).getX() - (schub / 20), middlerecs
+									.get(0).getY()));
+			middlerecs.set(1,
+					new BeweglichesBild(
+							this.getClass().getResource("rec2.JPG"), middlerecs
+									.get(1).getX() - (schub / 20), middlerecs
+									.get(1).getY()));
 		} else {
-			middlerecs.set(0, new MovingImage(this.getClass().getResource("rec2.JPG"), middlerecs.get(1)
-					.getX() - (RECWIDTH / 5), middlerecs.get(1).getY()));
-			middlerecs.set(1, new MovingImage(this.getClass().getResource("rec2.JPG"), middlerecs.get(0)
-					.getX() + 580, randomMidHeight()));
+			middlerecs.set(0,
+					new BeweglichesBild(
+							this.getClass().getResource("rec2.JPG"), middlerecs
+									.get(1).getX() - (schub / 20), middlerecs
+									.get(1).getY()));
+			middlerecs.set(1,
+					new BeweglichesBild(
+							this.getClass().getResource("rec2.JPG"), middlerecs
+									.get(0).getX() + 580, randomMidHeight()));
 		}
 	}
 
 	public boolean isHit() {
 		for (int x = 3; x <= 7; x++) {
-			double auftriebTemp = fis.getVariable("auftrieb").getLatestDefuzzifiedValue();
-			
-			double test = Math.round(helicopter.getY() - RECHEIGHT
-					- toprecs.get(x).getY());
-			fis.setVariable("oben", test);
-			double test2 = Math.round((bottomrecs.get(x).getY())
-					- (helicopter.getY() + 48));
-			fis.setVariable("unten", test2);
-			
-			fis.evaluate();
-			
-//			if(((auftriebTemp - fis.getVariable("auftrieb").getLatestDefuzzifiedValue()) > 1) || (auftriebTemp - fis.getVariable("auftrieb").getLatestDefuzzifiedValue()) < -1) {
-//				chartPanel.update();
-//			}
 
-			// TODO
-			// System.out.println("entfernung unten: "
-			// +((bottomrecs.get(x).getY())-(helicopter.getY() + 48))+
-			// "               entfernung oben: "+((helicopter.getY()-RECHEIGHT-(toprecs.get(x).getY()))));
+			// SENSOR OBEN
+			double oben = Math.round(helicopter.getY() - RECHEIGHT
+					- toprecs.get(x).getY());
+			if (oben > 100) {
+				fis.setVariable("oben", 100);
+			} else {
+				fis.setVariable("oben", oben);
+			}
+
+			// SENSOR UNTEN
+			double unten = Math.round((bottomrecs.get(x).getY())
+					- (helicopter.getY() + 48));
+			if (unten > 100) {
+				fis.setVariable("unten", 100);
+			} else {
+				fis.setVariable("unten", unten);
+			}
+			fis.evaluate();
+
 			if (helicopter.getY() + 48 >= bottomrecs.get(x).getY())
 				return true;
 		}
@@ -319,90 +312,148 @@ public class Helicopter extends Thread implements MouseListener {
 		Rectangle coptercheck = new Rectangle((int) helicopter.getX(),
 				(int) helicopter.getY(), 106, 48);
 
-		// TODO
-		
-		if ((middlerecs.get(0).getY()) > (helicopter.getY() - 100)
-				&& (helicopter.getY() - 100) > (middlerecs.get(0).getY() - 100)) {
-
-			fis.setVariable("front", (middlerecs.get(0).getX() - 302));
-			// System.out.println("MITTE: "+(middlerecs.get(0).getX() - 302));
-		} else {
-			fis.setVariable("front", 0);
-		}
-		
-		
-		fis.evaluate();
-		
-		// System.out.println("MITTE: " + (middlerecs.get(0).getX() - 302)
-		// + "    " + (middlerecs.get(0).getY() - RECHEIGHT)
-		// + "    HELI: " + (helicopter.getY() - 100));
 		return middlecheck.intersects(coptercheck);
 	}
 
-	public void crash() {
-		crashed = true;
-		if (distance > maxDistance) {
-			maxDistance = distance;
+	public void obenSensor() {
+	}
+
+	public void untenSensor() {
+	}
+
+	public void frontSensor() {
+		// FRONT SENSOR
+		if ((middlerecs.get(0).getY()) > (helicopter.getY() - 24)
+				&& (helicopter.getY() - 24) > (middlerecs.get(0).getY() - 73)) {
+			double front = (middlerecs.get(0).getX() - 302);
+
+			if (front > 100) {
+				fis.setVariable("front", 100);
+			} else if (front < 0) {
+				fis.setVariable("front", 0);
+			} else {
+				fis.setVariable("front", front);
+			}
+		} else {
+			fis.setVariable("front", 100);
+		}
+	}
+
+	public void frontUnten() {
+
+		// FRONT UNTEN SENSOR
+		fis.setVariable("frontUnten", 100);
+
+		// sehr weit
+		if ((380 > middlerecs.get(0).getX()) && middlerecs.get(0).getX() > 350) {
+			for (int i = 0; i < 74; i++) {
+				if ((helicopter.getY() + 128) > (middlerecs.get(0).getY() + i)
+						&& (middlerecs.get(0).getY() + i) > (helicopter.getY() + 108)) {
+					fis.setVariable("frontUnten", 100);
+				}
+			}
 		}
 
-		initiate();
+		// weit
+		if ((360 > middlerecs.get(0).getX()) && middlerecs.get(0).getX() > 330) {
+			for (int i = 0; i < 74; i++) {
+				if ((helicopter.getY() + 108) > (middlerecs.get(0).getY() + i)
+						&& (middlerecs.get(0).getY() + i) > (helicopter.getY() + 88)) {
+					fis.setVariable("frontUnten", 70);
+				}
+			}
+		}
+		// mittel
+		if ((340 > middlerecs.get(0).getX()) && middlerecs.get(0).getX() > 310) {
+			for (int i = 0; i < 74; i++) {
+				if ((helicopter.getY() + 88) > (middlerecs.get(0).getY() + i)
+						&& (middlerecs.get(0).getY() + i) > (helicopter.getY() + 68)) {
+					fis.setVariable("frontUnten", 40);
+
+				}
+			}
+		}
+		// nah
+		if ((320 > middlerecs.get(0).getX()) && middlerecs.get(0).getX() > 300) {
+			for (int i = 0; i < 74; i++) {
+				if ((helicopter.getY() + 68) > (middlerecs.get(0).getY() + i)
+						&& (middlerecs.get(0).getY() + i) > (helicopter.getY() + 48)) {
+					fis.setVariable("frontUnten", 20);
+
+				}
+			}
+		}
+
 	}
 
-	// moves the helicopter
+	public void frontOben() {
+
+		// FRONT OBEN SENSOR
+		fis.setVariable("frontOben", 100);
+
+		// sehr weit
+		if ((380 > middlerecs.get(0).getX()) && middlerecs.get(0).getX() > 350) {
+			for (int i = 0; i < 74; i++) {
+				if ((helicopter.getY() - 80) < (middlerecs.get(0).getY() + i)
+						&& (middlerecs.get(0).getY() + i) < (helicopter.getY() - 60)) {
+					fis.setVariable("frontOben", 100);
+				}
+			}
+		}
+
+		// weit
+		if ((360 > middlerecs.get(0).getX()) && middlerecs.get(0).getX() > 330) {
+			for (int i = 0; i < 74; i++) {
+				if ((helicopter.getY() - 60) < (middlerecs.get(0).getY() + i)
+						&& (middlerecs.get(0).getY() + i) < (helicopter.getY() - 40)) {
+					fis.setVariable("frontOben", 70);
+				}
+			}
+		}
+		// mittel
+		if ((340 > middlerecs.get(0).getX()) && middlerecs.get(0).getX() > 310) {
+			for (int i = 0; i < 74; i++) {
+				if ((helicopter.getY() - 40) < (middlerecs.get(0).getY() + i)
+						&& (middlerecs.get(0).getY() + i) < (helicopter.getY() - 20)) {
+					fis.setVariable("frontOben", 40);
+
+				}
+			}
+		}
+		// nah
+		if ((320 > middlerecs.get(0).getX()) && middlerecs.get(0).getX() > 300) {
+			for (int i = 0; i < 74; i++) {
+				if ((helicopter.getY() - 20) < (middlerecs.get(0).getY() + i)
+						&& (middlerecs.get(0).getY() + i) < (helicopter.getY())) {
+					fis.setVariable("frontOben", 20);
+
+				}
+			}
+		}
+
+	}
+
 	public void updateCopter() {
-		/*
-		 * upCount += .08; if (goingUp) { if (upCount < 3.5)
-		 * helicopter.setPosition(XPOS, (double) (helicopter.getY() - (.3 +
-		 * upCount))); else helicopter.setPosition(XPOS, (double)
-		 * (helicopter.getY() - (1.2 + upCount)));
-		 * helicopter.setImage("upCopter.GIF"); } else { if (upCount < 1)
-		 * 
-		 * helicopter.setPosition(XPOS, (double) (helicopter.getY() + upCount));
-		 * else helicopter.setPosition(XPOS, (double) (helicopter.getY() + (1.2
-		 * + upCount))); helicopter.setImage("helicopter.GIF"); }
-		 */
-//		chartPanel.repaint();
+
+		frontSensor();
+		frontOben();
+		frontUnten();
+		fis.evaluate();
+
 		if (fis.getVariable("auftrieb").getLatestDefuzzifiedValue() > 51) {
-			helicopter.setPosition(XPOS,
-					(double) (helicopter.getY() - (fis.getVariable("auftrieb").getLatestDefuzzifiedValue() / 50)));
+			helicopter
+					.setPosition(XPOS, (double) (helicopter.getY() - (fis
+							.getVariable("auftrieb")
+							.getLatestDefuzzifiedValue() / 50)));
 		} else if (fis.getVariable("auftrieb").getLatestDefuzzifiedValue() < 49) {
 
-			helicopter
-					.setPosition(
-							XPOS,
-							(double) (helicopter.getY() + ((fis.getVariable("auftrieb").getLatestDefuzzifiedValue() + 50) / 50)));
+			helicopter.setPosition(XPOS,
+					(double) (helicopter.getY() + ((fis.getVariable("auftrieb")
+							.getLatestDefuzzifiedValue() + 50) / 50)));
 
-		} 
+		}
 		if (isHit())
-			crash();
+			initiate();
 	}
 
-	// Called when the mouse exits the game window
-	public void mouseExited(MouseEvent e) {
-
-	}
-
-	// Called when the mouse enters the game window
-	public void mouseEntered(MouseEvent e) {
-
-	}
-
-	// Called when the mouse is released
-	public void mouseReleased(MouseEvent e) {
-		goingUp = false;
-		upCount = 0;
-	}
-
-	// Called when the mouse is pressed
-	public void mousePressed(MouseEvent e) {
-		if (!started)
-			started = true;
-		goingUp = true;
-		upCount = 0;
-	}
-
-	// Called when the mouse is released
-	public void mouseClicked(MouseEvent e) {
-
-	}
 }

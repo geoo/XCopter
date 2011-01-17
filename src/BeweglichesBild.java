@@ -3,27 +3,24 @@ import java.net.URL;
 
 import javax.swing.ImageIcon;
 
-class MovingImage
+class BeweglichesBild
 {
-	private Image image;		//The picture
-	private double x;			//X position
-	private double y;			//Y position
- 
-	//Construct a new Moving Image with image, x position, and y position given
-	public MovingImage(Image img, double xPos, double yPos)
+	private Image image;		
+	private double x;			
+	private double y;		
+	
+	public BeweglichesBild(Image img, double xPos, double yPos)
 	{
 		image = img;
 		x = xPos;
 		y = yPos;
 	}
  
-	//Construct a new Moving Image with image (from file path), x position, and y position given
-	public MovingImage(URL path, double xPos, double yPos)
+	public BeweglichesBild(URL path, double xPos, double yPos)
 	{
 		this(new ImageIcon(path).getImage(), xPos, yPos);
 	}
  
-	//They are set methods.  I don't feel like commenting them.
 	public void setPosition(double xPos, double yPos)
 	{
 		x = xPos;
@@ -45,7 +42,6 @@ class MovingImage
 		x = newX;
 	}
  
-	//Get methods which I'm also not commenting
 	public double getX()
 	{
 		return x;
