@@ -121,6 +121,10 @@ public class Init extends JApplet{
 			"	RULE 24 : IF frontUnten IS mittel THEN schub IS langsam;\n" +
 			"	RULE 25 : IF frontUnten IS nah THEN auftrieb IS starkerAuftrieb;\n" +
 			"	RULE 26 : IF frontUnten IS nah THEN schub IS sehr_langsam;\n" +
+			"	RULE 27 : IF front IS weit THEN auftrieb IS leichterAuftrieb;\n" +
+			"	RULE 28 : IF front IS mittel THEN auftrieb IS auftrieb;\n" +
+			"	RULE 29 : IF front IS nah THEN auftrieb IS starkerAuftrieb;\n" +
+
 			"\n" +
 			"END_RULEBLOCK\n" +
 			"\n" +

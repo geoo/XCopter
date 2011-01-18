@@ -243,7 +243,6 @@ public class Helicopter extends Thread {
 	}
 
 	// TODO
-	// moves the randomly generated middle rectangles
 	public void updateMiddle() {
 
 		double schub = fis.getVariable("schub").getLatestDefuzzifiedValue();
