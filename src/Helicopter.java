@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 import net.sourceforge.jFuzzyLogic.FIS;
+import net.sourceforge.jFuzzyLogic.plot.JPanelFis;
 
 public class Helicopter extends Thread {
 
 	// private Data data;
 	private FIS fis;
-	private ChartPanel chartPanel;
+	private JPanelFis chartPanel;
 
 	public static void main(String[] args) {
 
@@ -57,7 +58,7 @@ public class Helicopter extends Thread {
 	private ArrayList<BeweglichesBild> smoke;
 	private BeweglichesBild helicopter;
 
-	public Helicopter(FIS fis, ChartPanel chartPanel) {
+	public Helicopter(FIS fis, JPanelFis chartPanel) {
 		super();
 		this.fis = fis;
 		this.chartPanel = chartPanel;
@@ -275,6 +276,8 @@ public class Helicopter extends Thread {
 	public boolean isHit() {
 		for (int x = 3; x <= 7; x++) {
 
+			boolean repaint = false;
+			
 			// SENSOR OBEN
 			double oben = Math.round(helicopter.getY() - RECHEIGHT
 					- toprecs.get(x).getY());
@@ -282,6 +285,7 @@ public class Helicopter extends Thread {
 				fis.setVariable("oben", 100);
 			} else {
 				fis.setVariable("oben", oben);
+				repaint = true;
 			}
 
 			// SENSOR UNTEN
@@ -291,9 +295,13 @@ public class Helicopter extends Thread {
 				fis.setVariable("unten", 100);
 			} else {
 				fis.setVariable("unten", unten);
+				repaint = true;
 			}
 			fis.evaluate();
-
+			if (repaint) {
+				chartPanel.repaint();
+			}
+			
 			if (helicopter.getY() + 48 >= bottomrecs.get(x).getY())
 				return true;
 		}
@@ -322,6 +330,7 @@ public class Helicopter extends Thread {
 	}
 
 	public void frontSensor() {
+		
 		// FRONT SENSOR
 		if ((middlerecs.get(0).getY()) > (helicopter.getY() - 24)
 				&& (helicopter.getY() - 24) > (middlerecs.get(0).getY() - 73)) {
@@ -333,6 +342,7 @@ public class Helicopter extends Thread {
 				fis.setVariable("front", 0);
 			} else {
 				fis.setVariable("front", front);
+				chartPanel.repaint();
 			}
 		} else {
 			fis.setVariable("front", 100);
@@ -341,6 +351,7 @@ public class Helicopter extends Thread {
 
 	public void frontUnten() {
 
+		boolean repaint = false;
 		// FRONT UNTEN SENSOR
 		fis.setVariable("frontUnten", 100);
 
@@ -350,6 +361,7 @@ public class Helicopter extends Thread {
 				if ((helicopter.getY() + 128) > (middlerecs.get(0).getY() + i)
 						&& (middlerecs.get(0).getY() + i) > (helicopter.getY() + 108)) {
 					fis.setVariable("frontUnten", 100);
+					repaint = true;
 				}
 			}
 		}
@@ -360,6 +372,7 @@ public class Helicopter extends Thread {
 				if ((helicopter.getY() + 108) > (middlerecs.get(0).getY() + i)
 						&& (middlerecs.get(0).getY() + i) > (helicopter.getY() + 88)) {
 					fis.setVariable("frontUnten", 70);
+					repaint = true;
 				}
 			}
 		}
@@ -369,6 +382,7 @@ public class Helicopter extends Thread {
 				if ((helicopter.getY() + 88) > (middlerecs.get(0).getY() + i)
 						&& (middlerecs.get(0).getY() + i) > (helicopter.getY() + 68)) {
 					fis.setVariable("frontUnten", 40);
+					repaint = true;
 
 				}
 			}
@@ -379,15 +393,20 @@ public class Helicopter extends Thread {
 				if ((helicopter.getY() + 68) > (middlerecs.get(0).getY() + i)
 						&& (middlerecs.get(0).getY() + i) > (helicopter.getY() + 48)) {
 					fis.setVariable("frontUnten", 20);
-
+					repaint = true;
 				}
 			}
+		}
+		
+		if(repaint) {
+			chartPanel.repaint();
 		}
 
 	}
 
 	public void frontOben() {
 
+		boolean repaint = false;
 		// FRONT OBEN SENSOR
 		fis.setVariable("frontOben", 100);
 
@@ -397,6 +416,7 @@ public class Helicopter extends Thread {
 				if ((helicopter.getY() - 80) < (middlerecs.get(0).getY() + i)
 						&& (middlerecs.get(0).getY() + i) < (helicopter.getY() - 60)) {
 					fis.setVariable("frontOben", 100);
+					repaint = true;
 				}
 			}
 		}
@@ -407,6 +427,7 @@ public class Helicopter extends Thread {
 				if ((helicopter.getY() - 60) < (middlerecs.get(0).getY() + i)
 						&& (middlerecs.get(0).getY() + i) < (helicopter.getY() - 40)) {
 					fis.setVariable("frontOben", 70);
+					repaint = true;
 				}
 			}
 		}
@@ -416,6 +437,7 @@ public class Helicopter extends Thread {
 				if ((helicopter.getY() - 40) < (middlerecs.get(0).getY() + i)
 						&& (middlerecs.get(0).getY() + i) < (helicopter.getY() - 20)) {
 					fis.setVariable("frontOben", 40);
+					repaint = true;
 
 				}
 			}
@@ -426,11 +448,14 @@ public class Helicopter extends Thread {
 				if ((helicopter.getY() - 20) < (middlerecs.get(0).getY() + i)
 						&& (middlerecs.get(0).getY() + i) < (helicopter.getY())) {
 					fis.setVariable("frontOben", 20);
-
+					repaint = true;
 				}
 			}
 		}
 
+		if(repaint) {
+			chartPanel.repaint();
+		}
 	}
 
 	public void updateCopter() {

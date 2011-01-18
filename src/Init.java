@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.jFuzzyLogic.FIS;
+import net.sourceforge.jFuzzyLogic.plot.JPanelFis;
 
 import org.antlr.runtime.RecognitionException;
 
@@ -17,6 +18,7 @@ public class Init extends JApplet{
 	private FIS fis;
 	private JPanel boxPanel = new JPanel();
 	private Container container = getContentPane();
+	private JPanelFis chartPanel;
 	
 	public void loadFuzzyData() {
 		String fcl = "FUNCTION_BLOCK helicopter\n" +
@@ -146,6 +148,15 @@ public class Init extends JApplet{
 		fis.evaluate();
 	}
 	
+	public void drawChartPanels() {
+		this.chartPanel = new JPanelFis(fis);
+		chartPanel.setSize(new Dimension(550,800));
+		chartPanel.setPreferredSize(new Dimension(550,800));
+		chartPanel.setMaximumSize(new Dimension(550,800));
+		chartPanel.setMinimumSize(new Dimension(550,800));
+		boxPanel.add(chartPanel);
+	}
+	
 	public void init() {		
 		setSize(new Dimension(1300, 800));
 		try {
@@ -155,13 +166,11 @@ public class Init extends JApplet{
 					container.add(boxPanel);
 					loadFuzzyData();
 					
-					ChartPanel chartPanel;
-					new Thread(chartPanel = new ChartPanel(fis));
+					drawChartPanels();
 					
 					Helicopter helicopter;
 					new Thread(helicopter = new Helicopter(fis, chartPanel));	
 					
-					boxPanel.add(chartPanel.getChartPanel());
 					boxPanel.add(helicopter.getContainer());
 				}
 			});
