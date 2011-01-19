@@ -9,12 +9,12 @@ import javax.swing.JPanel;
 
 class ImagePanel extends JPanel {
  
-  	private Image background;					
-  	private ArrayList<BeweglichesBild> top;	
-	private ArrayList<BeweglichesBild> bottom;
-	private ArrayList<BeweglichesBild> middle;
-	private BeweglichesBild copter;
-	private ArrayList<BeweglichesBild> smoke;
+  	private Image hintergrund;					
+  	private ArrayList<BeweglichesBild> oben;	
+	private ArrayList<BeweglichesBild> unten;
+	private ArrayList<BeweglichesBild> mitte;
+	private BeweglichesBild heli;
+	private ArrayList<BeweglichesBild> rauch;
  
   	public ImagePanel(URL img) 
   	{
@@ -23,43 +23,43 @@ class ImagePanel extends JPanel {
  
   	public ImagePanel(Image img)
   	{
-    	background = img;
+    	hintergrund = img;
     	Dimension size = new Dimension(img.getWidth(null), img.getHeight(null));	
     	setPreferredSize(size);
     	setMinimumSize(size);
     	setMaximumSize(size);
     	setSize(size);
  
-    	top = new ArrayList<BeweglichesBild>();
-    	middle = new ArrayList<BeweglichesBild>();
-    	bottom = new ArrayList<BeweglichesBild>();
+    	oben = new ArrayList<BeweglichesBild>();
+    	mitte = new ArrayList<BeweglichesBild>();
+    	unten = new ArrayList<BeweglichesBild>();
  
-    	smoke = new ArrayList<BeweglichesBild>();
+    	rauch = new ArrayList<BeweglichesBild>();
   	}
  
 	
   	public void paintComponent(Graphics g) 
   	{
-    	g.drawImage(background, 0, 0, null); 
-    	for(BeweglichesBild img : top)
+    	g.drawImage(hintergrund, 0, 0, null); 
+    	for(BeweglichesBild img : oben)
     		g.drawImage(img.getImage(), (int)(img.getX()), (int)(img.getY()), null);
-    	for(BeweglichesBild img : middle)
+    	for(BeweglichesBild img : mitte)
     		g.drawImage(img.getImage(), (int)(img.getX()), (int)(img.getY()), null);
-    	for(BeweglichesBild img : bottom)
+    	for(BeweglichesBild img : unten)
     		g.drawImage(img.getImage(), (int)(img.getX()), (int)(img.getY()), null);
-    	for(BeweglichesBild img : smoke)
+    	for(BeweglichesBild img : rauch)
     		g.drawImage(img.getImage(), (int)(img.getX()), (int)(img.getY()), null);
-    	if(copter != null)
-    		g.drawImage(copter.getImage(), (int)(copter.getX()), (int)(copter.getY()), null);
+    	if(heli != null)
+    		g.drawImage(heli.getImage(), (int)(heli.getX()), (int)(heli.getY()), null);
   	}
  
-  	public void updateImages(ArrayList<BeweglichesBild> newTop,ArrayList<BeweglichesBild> newMiddle,ArrayList<BeweglichesBild> newBottom,BeweglichesBild newCopter,ArrayList<BeweglichesBild> newSmoke)
+  	public void updateBilder(ArrayList<BeweglichesBild> newTop,ArrayList<BeweglichesBild> newMiddle,ArrayList<BeweglichesBild> newBottom,BeweglichesBild newCopter,ArrayList<BeweglichesBild> newSmoke)
   	{
-  		top = newTop;
-  		copter = newCopter;
-  		middle = newMiddle;
-  		bottom = newBottom;
-  		smoke = newSmoke;
+  		oben = newTop;
+  		heli = newCopter;
+  		mitte = newMiddle;
+  		unten = newBottom;
+  		rauch = newSmoke;
   		repaint();	
   	}
 }

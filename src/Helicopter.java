@@ -146,7 +146,7 @@ public class Helicopter extends Thread {
 							.getResource("smoke.GIF"), 187, helicopter.getY()));
 				}
 			}
-			back.updateImages(recsOben, recsMitte, recsUnten, helicopter,
+			back.updateBilder(recsOben, recsMitte, recsUnten, helicopter,
 					rauch);
 		}
 	}

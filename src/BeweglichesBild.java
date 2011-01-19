@@ -5,13 +5,13 @@ import javax.swing.ImageIcon;
 
 class BeweglichesBild
 {
-	private Image image;		
+	private Image bild;		
 	private double x;			
 	private double y;		
 	
 	public BeweglichesBild(Image img, double xPos, double yPos)
 	{
-		image = img;
+		bild = img;
 		x = xPos;
 		y = yPos;
 	}
@@ -29,7 +29,7 @@ class BeweglichesBild
  
 	public void setImage(URL path)
 	{
-		image = new ImageIcon(path).getImage();
+		bild = new ImageIcon(path).getImage();
 	}
  
 	public void setY(double newY)
@@ -54,6 +54,6 @@ class BeweglichesBild
  
 	public Image getImage()
 	{
-		return image;
+		return bild;
 	}
 }
