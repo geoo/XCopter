@@ -9,53 +9,37 @@ import net.sourceforge.jFuzzyLogic.plot.JPanelFis;
 
 public class Helicopter extends Thread {
 
-	// private Data data;
 	private FIS fis;
 	private JPanelFis chartPanel;
 
 	public static void main(String[] args) {
 
-		/*
-		 * FIS fis; String fileName = "fcl.fcl"; fis = FIS.load(fileName, true);
-		 * fis.toStringFcl();
-		 * 
-		 * if (fis == null) { // Error while loading?
-		 * System.err.println("Can't load file: '" + fileName + "'"); return; }
-		 * fis.chart(); fis.setVariable("oben", 100);
-		 * fis.setVariable("frontOben", 100); fis.setVariable("front", 100);
-		 * fis.setVariable("frontUnten", 100); fis.setVariable("unten", 100);
-		 */
-		// HelicopterForm a = new HelicopterForm();
-
 	}
 
-	private JPanel background = new JPanel();
-	// private Container container;
-	// private JButton button;
+	private JPanel hintergrund = new JPanel();
 	private ImagePanel back;
 
-	public static boolean crashed;
-	public static boolean started;
-	public static boolean playedOnce;
+	public static boolean crash;
+	public static boolean gestartet;
+	public static boolean gespielt;
 
-	public boolean goingUp;
 
-	public static int distance;
+	public static int distanz;
 	public static int maxDistance;
 
 	public final int XPOS;
 	public final int NUMRECS;
-	public final int RECHEIGHT;
-	public final int RECWIDTH;
+	public final int RECHOEHE;
+	public final int RECBREITE;
 
 	private int moveIncrement;
-	private int numSmoke;
+	private int anzRauch;
 
-	private ArrayList<BeweglichesBild> toprecs;
-	private ArrayList<BeweglichesBild> bottomrecs;
-	private ArrayList<BeweglichesBild> middlerecs;
+	private ArrayList<BeweglichesBild> recsOben;
+	private ArrayList<BeweglichesBild> recsUnten;
+	private ArrayList<BeweglichesBild> recsMitte;
 	private ArrayList<BeweglichesBild> recs;
-	private ArrayList<BeweglichesBild> smoke;
+	private ArrayList<BeweglichesBild> rauch;
 	private BeweglichesBild helicopter;
 
 	public Helicopter(FIS fis, JPanelFis chartPanel) {
@@ -63,223 +47,221 @@ public class Helicopter extends Thread {
 		this.fis = fis;
 		this.chartPanel = chartPanel;
 		NUMRECS = 28;
-		RECHEIGHT = 73;
-		RECWIDTH = 29;
+		RECHOEHE = 73;
+		RECBREITE = 29;
 		XPOS = 200;
-		playedOnce = false;
+		gespielt = false;
 		maxDistance = 0;
 		start();
 	}
 
 	public void run() {
-		initiate();
+		initialisieren();
 	}
 
 	public JPanel getContainer() {
-		return this.background;
+		return this.hintergrund;
 	}
 
-	public void initiate() {
-		if (!playedOnce) {
-			background.setSize(new Dimension(818, 568));
-			background.setVisible(true);
+	public void initialisieren() {
+		if (!gespielt) {
+			hintergrund.setSize(new Dimension(818, 568));
+			hintergrund.setVisible(true);
 
 			back = new ImagePanel(this.getClass().getResource("back.JPG"));
-			background.add(back);
+			hintergrund.add(back);
 
 		}
-		playedOnce = true;
-		goingUp = false;
-		crashed = false;
-		started = true;
+		gespielt = true;
+		crash = false;
+		gestartet = true;
 
 		moveIncrement = 2;
-		numSmoke = 15;
+		anzRauch = 15;
 
 		recs = new ArrayList<BeweglichesBild>();
-		toprecs = new ArrayList<BeweglichesBild>();
-		middlerecs = new ArrayList<BeweglichesBild>();
-		bottomrecs = new ArrayList<BeweglichesBild>();
-		smoke = new ArrayList<BeweglichesBild>();
+		recsOben = new ArrayList<BeweglichesBild>();
+		recsMitte = new ArrayList<BeweglichesBild>();
+		recsUnten = new ArrayList<BeweglichesBild>();
+		rauch = new ArrayList<BeweglichesBild>();
 
 		helicopter = new BeweglichesBild(this.getClass().getResource(
 				"helicopter.png"), XPOS, 270);
 
 		for (int x = 0; x < NUMRECS; x++)
-			toprecs.add(new BeweglichesBild(this.getClass().getResource(
-					"rec2.JPG"), RECWIDTH * x, 30));
+			recsOben.add(new BeweglichesBild(this.getClass().getResource(
+					"rec2.JPG"), RECBREITE * x, 30));
 		for (int x = 0; x < NUMRECS; x++)
-			bottomrecs.add(new BeweglichesBild(this.getClass().getResource(
-					"rec2.JPG"), RECWIDTH * x, 450));
+			recsUnten.add(new BeweglichesBild(this.getClass().getResource(
+					"rec2.JPG"), RECBREITE * x, 450));
 
-		middlerecs.add(new BeweglichesBild(this.getClass().getResource(
-				"rec2.JPG"), 1392, randomMidHeight()));
-		middlerecs.add(new BeweglichesBild(this.getClass().getResource(
-				"rec2.JPG"), 1972, randomMidHeight()));
+		recsMitte.add(new BeweglichesBild(this.getClass().getResource(
+				"rec2.JPG"), 1392, zufallMitte()));
+		recsMitte.add(new BeweglichesBild(this.getClass().getResource(
+				"rec2.JPG"), 1972, zufallMitte()));
 
-		drawRectangles();
+		setzeRechtecke();
 	}
 
-	public void drawRectangles() {
-		long last = System.currentTimeMillis();
-		long lastCopter = System.currentTimeMillis();
-		long lastSmoke = System.currentTimeMillis();
-		int firstUpdates = 0;
-		double lastDistance = (double) System.currentTimeMillis();
+	public void setzeRechtecke() {
+		long letztes = System.currentTimeMillis();
+		long letzterCopter = System.currentTimeMillis();
+		long letzterRauch = System.currentTimeMillis();
+		int ersteUpdates = 0;
+		double letzteDistanz = (double) System.currentTimeMillis();
 		while (true) {
-			if (!crashed
-					&& started
+			if (!crash
+					&& gestartet
 					&& (double) System.currentTimeMillis()
-							- (double) (2900 / 40) > lastDistance) {
-				lastDistance = System.currentTimeMillis();
-				distance++;
+							- (double) (2900 / 40) > letzteDistanz) {
+				letzteDistanz = System.currentTimeMillis();
+				distanz++;
 			}
 
-			if (!crashed && started
-					&& System.currentTimeMillis() - 10 > lastCopter) {
-				lastCopter = System.currentTimeMillis();
+			if (!crash && gestartet
+					&& System.currentTimeMillis() - 10 > letzterCopter) {
+				letzterCopter = System.currentTimeMillis();
 				updateCopter();
-				updateMiddle();
+				updateMitte();
 			}
-			if (!crashed && started && System.currentTimeMillis() - 100 > last) {
-				last = System.currentTimeMillis();
-				updateRecs();
+			if (!crash && gestartet && System.currentTimeMillis() - 100 > letztes) {
+				letztes = System.currentTimeMillis();
+				updateRechtecke();
 			}
-			if (!crashed && started
-					&& System.currentTimeMillis() - 75 > lastSmoke) {
-				lastSmoke = System.currentTimeMillis();
-				if (firstUpdates < numSmoke) {
-					firstUpdates++;
-					smoke.add(new BeweglichesBild(this.getClass().getResource(
+			if (!crash && gestartet
+					&& System.currentTimeMillis() - 75 > letzterRauch) {
+				letzterRauch = System.currentTimeMillis();
+				if (ersteUpdates < anzRauch) {
+					ersteUpdates++;
+					rauch.add(new BeweglichesBild(this.getClass().getResource(
 							"smoke.GIF"), 187, helicopter.getY()));
-					for (int x = 0; x < firstUpdates; x++)
-						smoke.set(x, new BeweglichesBild(this.getClass()
+					for (int x = 0; x < ersteUpdates; x++)
+						rauch.set(x, new BeweglichesBild(this.getClass()
 								.getResource("smoke.GIF"),
-								smoke.get(x).getX() - 12, smoke.get(x).getY()));
+								rauch.get(x).getX() - 12, rauch.get(x).getY()));
 				} else {
-					for (int x = 0; x < numSmoke - 1; x++)
-						smoke.get(x).setY(smoke.get(x + 1).getY());
-					smoke.set(numSmoke - 1, new BeweglichesBild(this.getClass()
+					for (int x = 0; x < anzRauch - 1; x++)
+						rauch.get(x).setY(rauch.get(x + 1).getY());
+					rauch.set(anzRauch - 1, new BeweglichesBild(this.getClass()
 							.getResource("smoke.GIF"), 187, helicopter.getY()));
 				}
 			}
-			back.updateImages(toprecs, middlerecs, bottomrecs, helicopter,
-					smoke);
+			back.updateImages(recsOben, recsMitte, recsUnten, helicopter,
+					rauch);
 		}
 	}
 
-	public void updateRecs() {
+	public void updateRechtecke() {
 		for (int x = 0; x < (NUMRECS - 1); x++) // move all but the last
 												// rectangle 1 spot to the left
 		{
-			toprecs.set(x,
+			recsOben.set(x,
 					new BeweglichesBild(
-							this.getClass().getResource("rec2.JPG"), RECWIDTH
-									* x, toprecs.get(x + 1).getY()));
-			bottomrecs.set(x,
+							this.getClass().getResource("rec2.JPG"), RECBREITE
+									* x, recsOben.get(x + 1).getY()));
+			recsUnten.set(x,
 					new BeweglichesBild(
-							this.getClass().getResource("rec2.JPG"), RECWIDTH
-									* x, bottomrecs.get(x + 1).getY()));
+							this.getClass().getResource("rec2.JPG"), RECBREITE
+									* x, recsUnten.get(x + 1).getY()));
 		}
-		lastRec();
+		letztesRechteck();
 	}
 
-	public void lastRec() {
-		if (distance % 400 == 0)
+	public void letztesRechteck() {
+		if (distanz % 400 == 0)
 			moveIncrement++;
-		if (toprecs.get(26).getY() < 2) // if too high, move down
-			moveDown();
-		else if (bottomrecs.get(26).getY() > 463) // else if too low, move up
-			moveUp();
-		else // else move randomly
+		if (recsOben.get(26).getY() < 2)
+			runterBewegen();
+		else if (recsUnten.get(26).getY() > 463) 
+			hochBewegen();
+		else 
 		{
 			if ((int) (Math.random() * 60) == 50)
-				randomDrop();
+				zufaelligSetzen();
 			else {
 				if ((int) (Math.random() * 2) == 1)
-					moveUp();
+					hochBewegen();
 				else
-					moveDown();
+					runterBewegen();
 			}
 		}
 	}
 
-	public void randomDrop() {
-		toprecs.get(26).setY(
-				toprecs.get(26).getY() + (463 - bottomrecs.get(26).getY()));
-		bottomrecs.get(26).setY(463);
+	public void zufaelligSetzen() {
+		recsOben.get(26).setY(
+				recsOben.get(26).getY() + (463 - recsUnten.get(26).getY()));
+		recsUnten.get(26).setY(463);
 	}
 
-	public void moveDown() {
-		toprecs.set((NUMRECS - 1), new BeweglichesBild(this.getClass()
-				.getResource("rec2.JPG"), RECWIDTH * (NUMRECS - 1), toprecs
+	public void runterBewegen() {
+		recsOben.set((NUMRECS - 1), new BeweglichesBild(this.getClass()
+				.getResource("rec2.JPG"), RECBREITE * (NUMRECS - 1), recsOben
 				.get(26).getY() + moveIncrement));
-		bottomrecs.set((NUMRECS - 1), new BeweglichesBild(this.getClass()
-				.getResource("rec2.JPG"), RECWIDTH * (NUMRECS - 1), bottomrecs
+		recsUnten.set((NUMRECS - 1), new BeweglichesBild(this.getClass()
+				.getResource("rec2.JPG"), RECBREITE * (NUMRECS - 1), recsUnten
 				.get(26).getY() + moveIncrement));
 	}
 
-	public void moveUp() {
-		bottomrecs.set((NUMRECS - 1), new BeweglichesBild(this.getClass()
-				.getResource("rec2.JPG"), RECWIDTH * (NUMRECS - 1), bottomrecs
+	public void hochBewegen() {
+		recsUnten.set((NUMRECS - 1), new BeweglichesBild(this.getClass()
+				.getResource("rec2.JPG"), RECBREITE * (NUMRECS - 1), recsUnten
 				.get(26).getY() - moveIncrement));
-		toprecs.set((NUMRECS - 1), new BeweglichesBild(this.getClass()
-				.getResource("rec2.JPG"), RECWIDTH * (NUMRECS - 1), toprecs
+		recsOben.set((NUMRECS - 1), new BeweglichesBild(this.getClass()
+				.getResource("rec2.JPG"), RECBREITE * (NUMRECS - 1), recsOben
 				.get(26).getY() - moveIncrement));
 	}
 
-	public int randomMidHeight() {
+	public int zufallMitte() {
 		int max = 10000;
 		int min = 0;
 
 		for (int x = 0; x < NUMRECS; x++) {
-			if (toprecs.get(x).getY() > min)
-				min = (int) toprecs.get(x).getY();
-			if (bottomrecs.get(x).getY() < max)
-				max = (int) bottomrecs.get(x).getY();
+			if (recsOben.get(x).getY() > min)
+				min = (int) recsOben.get(x).getY();
+			if (recsUnten.get(x).getY() < max)
+				max = (int) recsUnten.get(x).getY();
 		}
-		min += RECHEIGHT;
-		max -= (RECHEIGHT + min);
+		min += RECHOEHE;
+		max -= (RECHOEHE + min);
 		return min + (int) (Math.random() * max);
 	}
 
-	// TODO
-	public void updateMiddle() {
+	public void updateMitte() {
 
 		double schub = fis.getVariable("schub").getLatestDefuzzifiedValue();
 		
-		if (middlerecs.get(0).getX() > -1 * RECWIDTH) {
-			middlerecs.set(0,
+		if (recsMitte.get(0).getX() > -1 * RECBREITE) {
+			recsMitte.set(0,
 					new BeweglichesBild(
-							this.getClass().getResource("rec2.JPG"), middlerecs
-									.get(0).getX() - (schub / 20), middlerecs
+							this.getClass().getResource("rec2.JPG"), recsMitte
+									.get(0).getX() - (schub / 20), recsMitte
 									.get(0).getY()));
-			middlerecs.set(1,
+			recsMitte.set(1,
 					new BeweglichesBild(
-							this.getClass().getResource("rec2.JPG"), middlerecs
-									.get(1).getX() - (schub / 20), middlerecs
+							this.getClass().getResource("rec2.JPG"), recsMitte
+									.get(1).getX() - (schub / 20), recsMitte
 									.get(1).getY()));
 		} else {
-			middlerecs.set(0,
+			recsMitte.set(0,
 					new BeweglichesBild(
-							this.getClass().getResource("rec2.JPG"), middlerecs
-									.get(1).getX() - (schub / 20), middlerecs
+							this.getClass().getResource("rec2.JPG"), recsMitte
+									.get(1).getX() - (schub / 20), recsMitte
 									.get(1).getY()));
-			middlerecs.set(1,
+			recsMitte.set(1,
 					new BeweglichesBild(
-							this.getClass().getResource("rec2.JPG"), middlerecs
-									.get(0).getX() + 580, randomMidHeight()));
+							this.getClass().getResource("rec2.JPG"), recsMitte
+									.get(0).getX() + 580, zufallMitte()));
 		}
 	}
 
-	public boolean isHit() {
+	public boolean istGetroffen() {
 		for (int x = 3; x <= 7; x++) {
 
 			boolean repaint = false;
 			
 			// SENSOR OBEN
-			double oben = Math.round(helicopter.getY() - RECHEIGHT
-					- toprecs.get(x).getY());
+			double oben = Math.round(helicopter.getY() - RECHOEHE
+					- recsOben.get(x).getY());
 			if (oben > 100) {
 				fis.setVariable("oben", 100);
 			} else {
@@ -288,7 +270,7 @@ public class Helicopter extends Thread {
 			}
 
 			// SENSOR UNTEN
-			double unten = Math.round((bottomrecs.get(x).getY())
+			double unten = Math.round((recsUnten.get(x).getY())
 					- (helicopter.getY() + 48));
 			if (unten > 100) {
 				fis.setVariable("unten", 100);
@@ -301,25 +283,25 @@ public class Helicopter extends Thread {
 				chartPanel.repaint();
 			}
 			
-			if (helicopter.getY() + 48 >= bottomrecs.get(x).getY())
+			if (helicopter.getY() + 48 >= recsUnten.get(x).getY())
 				return true;
 		}
 		for (int y = 3; y <= 7; y++)
-			if (helicopter.getY() <= toprecs.get(y).getY() + RECHEIGHT)
+			if (helicopter.getY() <= recsOben.get(y).getY() + RECHOEHE)
 				return true;
 		for (int z = 0; z <= 1; z++)
-			if (isInMidRange(z))
+			if (istInMittlererEntfernung(z))
 				return true;
 		return false;
 	}
 
-	public boolean isInMidRange(int num) {
-		Rectangle middlecheck = new Rectangle((int) middlerecs.get(num).getX(),
-				(int) middlerecs.get(num).getY(), RECWIDTH, RECHEIGHT);
-		Rectangle coptercheck = new Rectangle((int) helicopter.getX(),
+	public boolean istInMittlererEntfernung(int num) {
+		Rectangle checkMitte = new Rectangle((int) recsMitte.get(num).getX(),
+				(int) recsMitte.get(num).getY(), RECBREITE, RECHOEHE);
+		Rectangle checkCopter = new Rectangle((int) helicopter.getX(),
 				(int) helicopter.getY(), 106, 48);
 
-		return middlecheck.intersects(coptercheck);
+		return checkMitte.intersects(checkCopter);
 	}
 
 	public void obenSensor() {
@@ -331,9 +313,9 @@ public class Helicopter extends Thread {
 	public void frontSensor() {
 		
 		// FRONT SENSOR
-		if ((middlerecs.get(0).getY()) > (helicopter.getY() - 24)
-				&& (helicopter.getY() - 24) > (middlerecs.get(0).getY() - 73)) {
-			double front = (middlerecs.get(0).getX() - 302);
+		if ((recsMitte.get(0).getY()) > (helicopter.getY() - 24)
+				&& (helicopter.getY() - 24) > (recsMitte.get(0).getY() - 73)) {
+			double front = (recsMitte.get(0).getX() - 302);
 
 			if (front > 100) {
 				fis.setVariable("front", 100);
@@ -355,31 +337,31 @@ public class Helicopter extends Thread {
 		fis.setVariable("frontUnten", 100);
 
 		// sehr weit
-		if ((380 > middlerecs.get(0).getX()) && middlerecs.get(0).getX() > 350) {
+		if ((380 > recsMitte.get(0).getX()) && recsMitte.get(0).getX() > 350) {
 			for (int i = 0; i < 74; i++) {
-				if ((helicopter.getY() + 128) > (middlerecs.get(0).getY() + i)
-						&& (middlerecs.get(0).getY() + i) > (helicopter.getY() + 108)) {
-					fis.setVariable("frontUnten", 100);
+				if ((helicopter.getY() + 128) > (((int)recsMitte.get(0).getY()) + i)
+						&& (((int)recsMitte.get(0).getY()) + i) > (helicopter.getY() + 108)) {
+					fis.setVariable("frontUnten", 90);
 					repaint = true;
 				}
 			}
 		}
 
 		// weit
-		if ((360 > middlerecs.get(0).getX()) && middlerecs.get(0).getX() > 330) {
+		if ((360 > recsMitte.get(0).getX()) && recsMitte.get(0).getX() > 330) {
 			for (int i = 0; i < 74; i++) {
-				if ((helicopter.getY() + 108) > (middlerecs.get(0).getY() + i)
-						&& (middlerecs.get(0).getY() + i) > (helicopter.getY() + 88)) {
+				if ((helicopter.getY() + 108) > (((int)recsMitte.get(0).getY()) + i)
+						&& (((int)recsMitte.get(0).getY()) + i) > (helicopter.getY() + 88)) {
 					fis.setVariable("frontUnten", 70);
 					repaint = true;
 				}
 			}
 		}
 		// mittel
-		if ((340 > middlerecs.get(0).getX()) && middlerecs.get(0).getX() > 310) {
+		if ((340 > recsMitte.get(0).getX()) && recsMitte.get(0).getX() > 310) {
 			for (int i = 0; i < 74; i++) {
-				if ((helicopter.getY() + 88) > (middlerecs.get(0).getY() + i)
-						&& (middlerecs.get(0).getY() + i) > (helicopter.getY() + 68)) {
+				if ((helicopter.getY() + 88) > (((int)recsMitte.get(0).getY()) + i)
+						&& (((int)recsMitte.get(0).getY()) + i) > (helicopter.getY() + 68)) {
 					fis.setVariable("frontUnten", 40);
 					repaint = true;
 
@@ -387,10 +369,10 @@ public class Helicopter extends Thread {
 			}
 		}
 		// nah
-		if ((320 > middlerecs.get(0).getX()) && middlerecs.get(0).getX() > 300) {
+		if ((320 > recsMitte.get(0).getX()) && recsMitte.get(0).getX() > 300) {
 			for (int i = 0; i < 74; i++) {
-				if ((helicopter.getY() + 68) > (middlerecs.get(0).getY() + i)
-						&& (middlerecs.get(0).getY() + i) > (helicopter.getY() + 48)) {
+				if ((helicopter.getY() + 68) > (((int)recsMitte.get(0).getY()) + i)
+						&& (((int)recsMitte.get(0).getY()) + i) > (helicopter.getY() + 48)) {
 					fis.setVariable("frontUnten", 20);
 					repaint = true;
 				}
@@ -410,31 +392,32 @@ public class Helicopter extends Thread {
 		fis.setVariable("frontOben", 100);
 
 		// sehr weit
-		if ((380 > middlerecs.get(0).getX()) && middlerecs.get(0).getX() > 350) {
+		if ((380 > recsMitte.get(0).getX()) && recsMitte.get(0).getX() > 350) {
 			for (int i = 0; i < 74; i++) {
-				if ((helicopter.getY() - 80) < (middlerecs.get(0).getY() + i)
-						&& (middlerecs.get(0).getY() + i) < (helicopter.getY() - 60)) {
-					fis.setVariable("frontOben", 100);
+				if ((helicopter.getY() - 80) < (((int)recsMitte.get(0).getY()) + i)
+						&& (((int)recsMitte.get(0).getY()) + i) < (helicopter.getY() - 60)) {
+					fis.setVariable("frontOben", 90);
 					repaint = true;
+
 				}
 			}
 		}
 
 		// weit
-		if ((360 > middlerecs.get(0).getX()) && middlerecs.get(0).getX() > 330) {
+		if ((360 > recsMitte.get(0).getX()) && recsMitte.get(0).getX() > 330) {
 			for (int i = 0; i < 74; i++) {
-				if ((helicopter.getY() - 60) < (middlerecs.get(0).getY() + i)
-						&& (middlerecs.get(0).getY() + i) < (helicopter.getY() - 40)) {
+				if ((helicopter.getY() - 60) < (((int)recsMitte.get(0).getY()) + i)
+						&& (((int)recsMitte.get(0).getY()) + i) < (helicopter.getY() - 40)) {
 					fis.setVariable("frontOben", 70);
 					repaint = true;
 				}
 			}
 		}
 		// mittel
-		if ((340 > middlerecs.get(0).getX()) && middlerecs.get(0).getX() > 310) {
+		if ((340 > recsMitte.get(0).getX()) && recsMitte.get(0).getX() > 310) {
 			for (int i = 0; i < 74; i++) {
-				if ((helicopter.getY() - 40) < (middlerecs.get(0).getY() + i)
-						&& (middlerecs.get(0).getY() + i) < (helicopter.getY() - 20)) {
+				if ((helicopter.getY() - 40) < (((int)recsMitte.get(0).getY()) + i)
+						&& (((int)recsMitte.get(0).getY()) + i) < (helicopter.getY() - 20)) {
 					fis.setVariable("frontOben", 40);
 					repaint = true;
 
@@ -442,10 +425,10 @@ public class Helicopter extends Thread {
 			}
 		}
 		// nah
-		if ((320 > middlerecs.get(0).getX()) && middlerecs.get(0).getX() > 300) {
+		if ((320 > recsMitte.get(0).getX()) && recsMitte.get(0).getX() > 300) {
 			for (int i = 0; i < 74; i++) {
-				if ((helicopter.getY() - 20) < (middlerecs.get(0).getY() + i)
-						&& (middlerecs.get(0).getY() + i) < (helicopter.getY())) {
+				if ((helicopter.getY() - 20) < (((int)recsMitte.get(0).getY()) + i)
+						&& (((int)recsMitte.get(0).getY()) + i) < (helicopter.getY())) {
 					fis.setVariable("frontOben", 20);
 					repaint = true;
 				}
@@ -476,8 +459,8 @@ public class Helicopter extends Thread {
 							.getLatestDefuzzifiedValue() + 50) / 50)));
 
 		}
-		if (isHit())
-			initiate();
+		if (istGetroffen())
+			initialisieren();
 	}
 
 }

@@ -136,7 +136,6 @@ public class Init extends JApplet{
 		try {
 			fis = FIS.createFromString(fcl, true);
 		} catch (RecognitionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
